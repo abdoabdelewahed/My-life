@@ -46,7 +46,6 @@ import { CertificatesPage } from './components/CertificatesPage';
 import { AchievementsModal } from './components/AchievementsModal';
 import { LevelUpModal } from './components/LevelUpModal';
 import { HabitsPage } from './components/HabitsPage';
-import { RecoveryPage } from './components/RecoveryPage';
 import { StreakModal } from './components/StreakModal';
 import { PointsModal } from './components/PointsModal';
 import AbilitiesPage from './components/AbilitiesPage';
@@ -57,7 +56,7 @@ import { playPop, playLevelUp } from './utils/sounds';
 import confetti from 'canvas-confetti';
 import { Button } from './components/ui/Button';
 
-type TabType = 'tasks' | 'tools' | 'roadmap' | 'certificates' | 'menu' | 'about' | 'habits' | 'abilities' | 'recovery';
+type TabType = 'tasks' | 'tools' | 'roadmap' | 'certificates' | 'menu' | 'about' | 'habits' | 'abilities';
 type PostOnboardingStep = 'none' | 'habits_intro' | 'habits_test' | 'results';
 
 export default function App() {
@@ -415,7 +414,6 @@ export default function App() {
 
   const tabs = [
     { id: 'habits', label: 'عاداتي', icon: <Activity size={20} /> },
-    { id: 'recovery', label: 'التعافي', icon: <Heart size={20} /> },
     { id: 'tasks', label: 'الرئيسية', icon: <Home size={20} /> },
     { id: 'abilities', label: 'قدراتي', icon: <Brain size={20} /> },
     { id: 'menu', label: 'القائمة', icon: <Menu size={20} /> },
@@ -439,7 +437,6 @@ export default function App() {
   }, [postOnboardingStep]);
 
   const [habitsView, setHabitsView] = useState<string>('test_selection');
-  const [recoveryView, setRecoveryView] = useState<string>('test_selection');
   const [abilitiesView, setAbilitiesView] = useState<string>('dashboard');
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('soundEnabled') !== 'false');
 
@@ -569,7 +566,7 @@ export default function App() {
           </div>
           
           {/* Header */}
-          {(activeTab !== 'habits' && activeTab !== 'recovery' || habitsView === 'test_selection' || habitsView === 'results' || recoveryView === 'test_selection' || recoveryView === 'results') && 
+          {(activeTab !== 'habits' || habitsView === 'test_selection' || habitsView === 'results') && 
            (activeTab !== 'abilities' || abilitiesView === 'dashboard' || abilitiesView === 'library') &&
            activeTab !== 'about' && (
             <header className="sticky top-0 z-40 bg-[#121212]/40 backdrop-blur-2xl border-b border-white/5 transition-all duration-300">
@@ -688,7 +685,7 @@ export default function App() {
         </header>
       )}
 
-      <main className={(activeTab === 'about' || activeTab === 'habits' || activeTab === 'recovery' || (activeTab === 'abilities' && abilitiesView === 'results')) ? 'w-full' : 'max-w-6xl mx-auto px-4 py-6 md:py-8'}>
+      <main className={(activeTab === 'about' || activeTab === 'habits' || (activeTab === 'abilities' && abilitiesView === 'results')) ? 'w-full' : 'max-w-6xl mx-auto px-4 py-6 md:py-8'}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -717,12 +714,6 @@ export default function App() {
             {activeTab === 'habits' && (
               <HabitsPage 
                 onViewChange={setHabitsView}
-                onActivityComplete={handleActivityComplete}
-              />
-            )}
-            {activeTab === 'recovery' && (
-              <RecoveryPage 
-                onViewChange={setRecoveryView}
                 onActivityComplete={handleActivityComplete}
               />
             )}
@@ -775,7 +766,6 @@ export default function App() {
       {(!showOnboarding && 
         postOnboardingStep === 'none' && 
         (activeTab !== 'habits' || habitsView === 'test_selection' || habitsView === 'results') && 
-        (activeTab !== 'recovery' || recoveryView === 'test_selection' || recoveryView === 'results') && 
         (activeTab !== 'abilities' || abilitiesView === 'dashboard' || abilitiesView === 'library') &&
         activeTab !== 'about') && (
         <nav className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[450px] bg-[#1a2e26] backdrop-blur-3xl border border-white/10 z-50 p-2 flex justify-between items-center shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-3xl gap-2">
