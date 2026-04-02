@@ -15,17 +15,92 @@ export const PATH_COLORS = [
 ];
 
 export const USER_CHARACTERS = [
-  { id: 'c1', level: 1, name: 'الصحوة', icon: 'Zap', description: 'بداية رحلة الوعي الحقيقي، حيث تدرك قوتك الكامنة وتتخذ القرار الشجاع للتحرر من القيود والبدء في تغيير حياتك للأفضل.', requirements: { lessons: 0, xp: 0, paths: 0 } },
-  { id: 'c2', level: 2, name: 'المواجهة', icon: 'Shield', description: 'مرحلة الشجاعة. تواجه مخاوفك، وتعترف بأنماطك السلبية وجروحك دون هروب أو إنكار.', requirements: { lessons: 5, xp: 200, paths: 0 } },
-  { id: 'c3', level: 3, name: 'التفكيك', icon: 'Brain', description: 'مرحلة إعادة البرمجة. تعمل على تفكيك المعتقدات المقيدة والتخلص من الأعباء العاطفية القديمة.', requirements: { lessons: 15, xp: 600, paths: 1 } },
-  { id: 'c4', level: 4, name: 'إعادة البناء', icon: 'Target', description: 'مرحلة التأسيس الجديد. تبني هويتك بوعي، تضع حدوداً صحية، وتزرع عادات تدعم نموك.', requirements: { lessons: 30, xp: 1200, paths: 2 } },
-  { id: 'c5', level: 5, name: 'التكامل', icon: 'Heart', description: 'مرحلة التصالح التام. تتقبل كل أجزاء نفسك (النور والظل) وتعيش بانسجام داخلي حقيقي.', requirements: { lessons: 50, xp: 2500, paths: 3 } },
-  { id: 'c6', level: 6, name: 'التسامي', icon: 'Crown', description: 'قمة الهرم النفسي (تحقيق الذات). تعيش بأصالة كاملة وتفيض بسلامك الداخلي لمن حولك.', requirements: { lessons: 100, xp: 5000, paths: 4 } },
+  { 
+    id: 'c1', 
+    name: 'المستكشف', 
+    icon: 'Zap', 
+    color: 'bg-[#10b981]',
+    image: 'https://api.dicebear.com/7.x/notionists/svg?seed=Felix&backgroundColor=transparent', 
+    description: 'فضولي ونشيط، يسعى دائماً لاكتشاف الجديد.', 
+    requirements: { lessons: 0, xp: 0, paths: 0 } 
+  },
+  { 
+    id: 'c2', 
+    name: 'الحكيم', 
+    icon: 'Brain', 
+    color: 'bg-[#0ea5e9]',
+    image: 'https://api.dicebear.com/7.x/notionists/svg?seed=Aneka&backgroundColor=transparent', 
+    description: 'هادئ ومفكر، يتخذ قراراته بحكمة.', 
+    requirements: { lessons: 0, xp: 0, paths: 0 } 
+  },
+  { 
+    id: 'c3', 
+    name: 'المحارب', 
+    icon: 'Shield', 
+    color: 'bg-[#f97316]',
+    image: 'https://api.dicebear.com/7.x/notionists/svg?seed=Caleb&backgroundColor=transparent', 
+    description: 'شجاع ومقدام، لا يخشى التحديات.', 
+    requirements: { lessons: 0, xp: 0, paths: 0 } 
+  },
+  { 
+    id: 'c4', 
+    name: 'الغامض', 
+    icon: 'Star', 
+    color: 'bg-[#312e81]',
+    image: 'https://api.dicebear.com/7.x/notionists/svg?seed=Jocelyn&backgroundColor=transparent', 
+    description: 'هادئ وعميق، يمتلك أسراراً كثيرة.', 
+    requirements: { lessons: 0, xp: 0, paths: 0 } 
+  },
+  { 
+    id: 'c5', 
+    name: 'المبدع', 
+    icon: 'Zap', 
+    color: 'bg-[#eab308]',
+    image: 'https://api.dicebear.com/7.x/notionists/svg?seed=George&backgroundColor=transparent', 
+    description: 'مبتكر وخيالي، يرى العالم بطريقة مختلفة.', 
+    requirements: { lessons: 0, xp: 0, paths: 0 } 
+  },
+  { 
+    id: 'c6', 
+    name: 'القائد', 
+    icon: 'Crown', 
+    color: 'bg-[#a855f7]',
+    image: 'https://api.dicebear.com/7.x/notionists/svg?seed=Aiden&backgroundColor=transparent', 
+    description: 'ملهم ومؤثر، يقود الآخرين نحو النجاح.', 
+    requirements: { lessons: 0, xp: 0, paths: 0 } 
+  },
   
   // Special Purchasable Characters
-  { id: 's1', level: 0, name: 'المحارب الذهبي', icon: 'Shield', price: 1000, description: 'شخصية نادرة ترمز للقوة المطلقة والإرادة الحديدية التي لا تقهر.', requirements: { lessons: 0, xp: 0, paths: 0 } },
-  { id: 's2', level: 0, name: 'الحكيم الأزرق', icon: 'Brain', price: 2500, description: 'شخصية تمثل الحكمة العميقة والهدوء النفسي في أحلك الظروف.', requirements: { lessons: 0, xp: 0, paths: 0 } },
-  { id: 's3', level: 0, name: 'روح السلام', icon: 'Heart', price: 5000, description: 'أرقى الشخصيات التي تفيض بالحب والسكينة، وتمنح من حولها شعوراً بالأمان.', requirements: { lessons: 0, xp: 0, paths: 0 } }
+  { 
+    id: 's1', 
+    name: 'المحارب الذهبي', 
+    icon: 'Shield', 
+    color: 'bg-yellow-600',
+    image: 'https://api.dicebear.com/7.x/notionists/svg?seed=Warrior&backgroundColor=transparent', 
+    price: 1000, 
+    description: 'شخصية نادرة ترمز للقوة المطلقة والإرادة الحديدية التي لا تقهر.', 
+    requirements: { lessons: 0, xp: 0, paths: 0 } 
+  },
+  { 
+    id: 's2', 
+    name: 'الحكيم الأزرق', 
+    icon: 'Brain', 
+    color: 'bg-blue-800',
+    image: 'https://api.dicebear.com/7.x/notionists/svg?seed=Sage&backgroundColor=transparent', 
+    price: 2500, 
+    description: 'شخصية تمثل الحكمة العميقة والهدوء النفسي في أحلك الظروف.', 
+    requirements: { lessons: 0, xp: 0, paths: 0 } 
+  },
+  { 
+    id: 's3', 
+    name: 'روح السلام', 
+    icon: 'Heart', 
+    color: 'bg-rose-400',
+    image: 'https://api.dicebear.com/7.x/notionists/svg?seed=Peace&backgroundColor=transparent', 
+    price: 5000, 
+    description: 'أرقى الشخصيات التي تفيض بالحب والسكينة، وتمنح من حولها شعوراً بالأمان.', 
+    requirements: { lessons: 0, xp: 0, paths: 0 } 
+  }
 ];
 
 export const INITIAL_TASKS: Task[] = [

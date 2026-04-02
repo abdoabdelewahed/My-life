@@ -33,11 +33,11 @@ export const ProgressPage = ({ routines, onClose }: ProgressPageProps) => {
     });
     
     let simplifiedTitle = routine.title;
-    if (routine.title === 'نفسيتي') simplifiedTitle = 'نفسيتي';
-    else if (routine.title === 'إيماني') simplifiedTitle = 'إيماني';
-    else if (routine.title === 'إنتاجيتي') simplifiedTitle = 'إنتاجيتي';
-    else if (routine.title === 'بدني') simplifiedTitle = 'بدني';
-    else if (routine.title === 'علاقاتي') simplifiedTitle = 'علاقاتي';
+    if (routine.title.includes('النفسية')) simplifiedTitle = 'نفسيتي';
+    else if (routine.title.includes('إيماني')) simplifiedTitle = 'إيماني';
+    else if (routine.title.includes('الانتاجية')) simplifiedTitle = 'إنتاجيتي';
+    else if (routine.title.includes('البدنية')) simplifiedTitle = 'بدني';
+    else if (routine.title.includes('علاقاتي')) simplifiedTitle = 'علاقاتي';
 
     // Calculate streak from history
     const history = JSON.parse(localStorage.getItem('improvement_routine_history') || '{}');

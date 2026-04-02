@@ -146,11 +146,11 @@ export default function App() {
   const [ownedCharacters, setOwnedCharacters] = useState<string[]>(() => {
     const saved = localStorage.getItem('ownedCharacters');
     if (saved) return JSON.parse(saved);
-    // Default owned characters are the ones unlocked by level
-    return USER_CHARACTERS.filter(c => c.level > 0 && c.level <= level).map(c => c.id);
+    // Default owned characters are the ones that don't have a price
+    return USER_CHARACTERS.filter(c => !c.price).map(c => c.id);
   });
   const [activeCharacterId, setActiveCharacterId] = useState(() => {
-    return localStorage.getItem('activeCharacterId') || (USER_CHARACTERS.find(c => c.level === level)?.id || 'c1');
+    return localStorage.getItem('activeCharacterId') || 'c1';
   });
   const [showCertificate, setShowCertificate] = useState(false);
   const [completedPathName, setCompletedPathName] = useState('');
@@ -241,15 +241,10 @@ export default function App() {
 
     setXp(prev => {
       const newXp = prev + xpGained;
-      // Check for level up and unlock characters
+      // Check for level up
       const newLevel = Math.floor(1 + Math.sqrt(newXp / 100)); // Simple level formula
       if (newLevel > level) {
         setLevel(newLevel);
-        // Automatically unlock level-based characters
-        const newlyUnlocked = USER_CHARACTERS.filter(c => c.level > 0 && c.level <= newLevel && !ownedCharacters.includes(c.id));
-        if (newlyUnlocked.length > 0) {
-          setOwnedCharacters(prevOwned => [...prevOwned, ...newlyUnlocked.map(c => c.id)]);
-        }
       }
       return newXp;
     });
@@ -346,23 +341,15 @@ export default function App() {
   const completedCount = LEARNING_PATHS.reduce((acc, path) => acc + (pathProgress[path.id] || 0), 0);
   const progress = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
   
-  // Calculate progress within the current level based on requirements
+  // Calculate progress within the current level
   const levelProgress = useMemo(() => {
-    const nextLevel = level + 1;
-    const nextChar = USER_CHARACTERS.find(c => c.level === nextLevel);
-    if (!nextChar || !nextChar.requirements) return 0;
-
-    const req = nextChar.requirements;
-    const xpProgress = Math.min(1, xp / req.xp);
-    const lessonsProgress = Math.min(1, (stats.lessonsCompleted || 0) / req.lessons);
-    const pathsProgress = req.paths > 0 
-      ? Math.min(1, (stats.pathsCompleted || 0) / req.paths)
-      : 1;
-
-    const totalReqs = req.paths > 0 ? 3 : 2;
-    const progressSum = xpProgress + lessonsProgress + (req.paths > 0 ? pathsProgress : 0);
-    return progressSum / totalReqs;
-  }, [level, xp, stats]);
+    const xpForCurrentLevel = Math.pow(level - 1, 2) * 100;
+    const xpForNextLevel = Math.pow(level, 2) * 100;
+    const xpInLevel = xp - xpForCurrentLevel;
+    const xpRequired = xpForNextLevel - xpForCurrentLevel;
+    
+    return Math.min(1, Math.max(0, xpInLevel / xpRequired));
+  }, [level, xp]);
 
   // Dynamic character style based on progress
   const characterStyle = {
@@ -393,7 +380,7 @@ export default function App() {
 
   useEffect(() => {
     // Gamification logic: Level up when levelProgress reaches 100%
-    if (levelProgress >= 1 && level < USER_CHARACTERS.length) {
+    if (levelProgress >= 1) {
       const nextLevel = level + 1;
       setLevel(nextLevel);
       playLevelUp();
@@ -584,7 +571,16 @@ export default function App() {
                 >
                   <div className={`w-8 h-8 md:w-9 md:h-9 ${activePathColor.bg} rounded-lg flex items-center justify-center text-black shadow-2xl relative overflow-hidden transition-transform group-hover:rotate-3`}>
                     <div className={`absolute inset-0 opacity-40 ${activePathColor.gradientFrom}`} />
-                    <CharacterIcon size={16} className="md:w-4 md:h-4 relative z-10" />
+                    {currentCharacter.image ? (
+                      <img 
+                        src={currentCharacter.image} 
+                        alt={currentCharacter.name} 
+                        className="w-full h-full object-cover relative z-10"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <CharacterIcon size={16} className="md:w-4 md:h-4 relative z-10" />
+                    )}
                   </div>
                   <div className="flex flex-col items-start justify-center">
                     <div className="flex items-center gap-1.5">
@@ -915,7 +911,7 @@ export default function App() {
         isOpen={showLevelUpModal}
         onClose={() => setShowLevelUpModal(false)}
         level={level}
-        character={USER_CHARACTERS.find(c => c.level === level) || USER_CHARACTERS[0]}
+        character={currentCharacter}
       />
           </motion.div>
         )}
