@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Tajawal:wght@300;400;500;700;800;900&family=Cormorant+Garamond:ital,wght@1,400;1,600&family=Dancing+Script:wght@400..700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Tajawal", -apple-system, BlinkMacSystemFont, "SF Pro Arabic", "SF Pro Display", ui-sans-serif, system-ui, sans-serif;
+  --font-script: "Dancing Script", cursive;
+}
+
+@layer base {
+  html {
+    direction: rtl;
+    font-family: "Plus Jakarta Sans", "Tajawal", -apple-system, BlinkMacSystemFont, sans-serif;
+    scroll-behavior: smooth;
+    background-color: #121212; /* Spotify deep dark */
+  }
+  
+  body {
+    @apply bg-[#121212] text-white;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-[#1c1c1e]/80 backdrop-blur-2xl border border-white/10 shadow-2xl;
+  }
+  .glass-panel-dark {
+    @apply bg-black/80 backdrop-blur-2xl border border-white/10 shadow-2xl;
+  }
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-l from-emerald-400 to-teal-500;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  .animate-spin-vortex {
+    animation: spin-vortex 3s linear infinite;
+  }
+  @keyframes spin-vortex {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .vortex-gradient {
+    background: conic-gradient(from 0deg, #8b5cf6, #3b82f6, #10b981, #8b5cf6);
+  }
+  @keyframes gemini-wave {
+    0%, 100% { background-position: 0% 100%; opacity: 0.6; }
+    50% { background-position: 0% 50%; opacity: 1; }
+  }
+  @keyframes gradient-xy {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  .animate-gradient-xy {
+    animation: gradient-xy 15s ease infinite;
+    background-size: 200% 200%;
+  }
+  .animate-twinkle {
+    animation: twinkle 2s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+  .animate-glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 1; filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.4)); }
+    50% { opacity: 0.8; filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.8)); }
+  }
+  .animate-slow-drift {
+    animation: slow-drift 8s ease-in-out infinite;
+  }
+  @keyframes slow-drift {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(10px, -5px) rotate(5deg); }
+    50% { transform: translate(0, 10px) rotate(0deg); }
+    75% { transform: translate(-10px, -5px) rotate(-5deg); }
+  }
+  .animate-fast-drift {
+    animation: fast-drift 4s ease-in-out infinite;
+  }
+  @keyframes fast-drift {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(10px, -5px) rotate(5deg); }
+    50% { transform: translate(0, 10px) rotate(0deg); }
+    75% { transform: translate(-10px, -5px) rotate(-5deg); }
+  }
+  .bg-atmospheric {
+    background: radial-gradient(circle at 50% -20%, rgba(139, 92, 246, 0.15) 0%, transparent 70%),
+                radial-gradient(circle at 0% 100%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+  }
+  .glass-card {
+    @apply bg-white/[0.03] backdrop-blur-xl border border-white/10 shadow-2xl;
+  }
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap');

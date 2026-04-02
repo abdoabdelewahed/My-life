@@ -1,0 +1,16 @@
+{
+  "name": "منصة الثراء المعرفي 2026",
+  "short_name": "الثراء المعرفي",
+  "description": "رحلة الوعي الداخلي والنمو الذاتي",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2991/2991112.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
