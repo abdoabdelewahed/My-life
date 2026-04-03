@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.29.0",
+    "@tailwindcss/vite": "^4.2.2",
     "canvas-confetti": "^1.9.4",
     "chess.js": "^1.4.0",
     "clsx": "^2.1.1",
@@ -30,24 +31,18 @@
     "vite-plugin-pwa": "^1.2.0"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.2.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/canvas-confetti": "^1.9.0",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^6.0.1",
+    "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.21",
     "jsdom": "^29.0.1",
     "tailwindcss": "^4.2.2",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
-    "vite": "^8.0.3",
-    "vitest": "^4.1.2"
-  },
-  "overrides": {
-    "@tailwindcss/vite": {
-      "vite": "$vite"
-    }
+    "vite": "^7.3.1",
+    "vitest": "^3.0.0-beta.1"
   }
 }
