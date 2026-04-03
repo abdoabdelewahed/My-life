@@ -5,15 +5,11 @@ import { Button } from './ui/Button';
 const { Zap, FileBadge, Info, ChevronLeft, Sparkles, Trophy, Users, Volume2, VolumeX } = Lucide;
 
 interface MenuPageProps {
-  onNavigate: (tab: 'tools' | 'certificates' | 'about' | 'tasks') => void;
+  onNavigate: (tab: 'tools' | 'certificates' | 'about' | 'tasks' | 'settings' | 'store') => void;
   completedCount: number;
   stats: any;
-  onUpdateStats: (stats: any) => void;
-  onLogout: () => void;
   isInstallable?: boolean;
   onInstall?: () => void;
-  soundEnabled: boolean;
-  setSoundEnabled: (enabled: boolean) => void;
 }
 
 const container = {
@@ -29,12 +25,11 @@ const item = {
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };
 
-export const MenuPage = ({ onNavigate, completedCount, stats, onUpdateStats, onLogout, isInstallable, onInstall, soundEnabled, setSoundEnabled }: MenuPageProps) => {
+export const MenuPage = ({ onNavigate, completedCount, stats, isInstallable, onInstall }: MenuPageProps) => {
   const menuItems = [
     {
       id: 'certificates',
-      title: 'الشهادات والإنجازات',
-      description: 'استعرض جميع الشهادات التي حصلت عليها خلال رحلتك.',
+      title: 'الشهادات',
       icon: <FileBadge size={24} className="text-emerald-500" />,
       color: 'from-emerald-500/20 to-emerald-500/5',
       borderColor: 'border-emerald-500/30',
@@ -42,9 +37,24 @@ export const MenuPage = ({ onNavigate, completedCount, stats, onUpdateStats, onL
       disabled: completedCount === 0
     },
     {
+      id: 'store',
+      title: 'المتجر',
+      icon: <Lucide.ShoppingBag size={24} className="text-orange-500" />,
+      color: 'from-orange-500/20 to-orange-500/5',
+      borderColor: 'border-orange-500/30',
+      textColor: 'text-orange-400'
+    },
+    {
+      id: 'settings',
+      title: 'الإعدادات',
+      icon: <Lucide.Settings size={24} className="text-gray-500" />,
+      color: 'from-gray-500/20 to-gray-500/5',
+      borderColor: 'border-gray-500/30',
+      textColor: 'text-gray-400'
+    },
+    {
       id: 'about',
       title: 'من نحن',
-      description: 'تعرف على رؤية منصة الثراء المعرفي 2026 وأهدافنا.',
       icon: <Users size={24} className="text-blue-500" />,
       color: 'from-blue-500/20 to-blue-500/5',
       borderColor: 'border-blue-500/30',
@@ -52,116 +62,8 @@ export const MenuPage = ({ onNavigate, completedCount, stats, onUpdateStats, onL
     }
   ];
 
-  const useForgivenessDay = () => {
-    if (stats?.forgivenessDays > 0) {
-      onUpdateStats({ ...stats, forgivenessDays: stats.forgivenessDays - 1 });
-    }
-  };
-
   return (
     <div className="space-y-8">
-      <div className="text-center mb-6 md:mb-8 relative">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          {/* Ethereal Background Animation */}
-          <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-            <motion.div
-              animate={{
-                x: [0, 20, -20, 0],
-                y: [0, -20, 20, 0],
-                scale: [1, 1.1, 0.9, 1],
-              }}
-              transition={{
-                duration: 10,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 md:w-64 md:h-64 bg-emerald-500/10 blur-[60px] md:blur-[80px] rounded-full"
-            />
-            <motion.div
-              animate={{
-                x: [0, -30, 30, 0],
-                y: [0, 30, -30, 0],
-                scale: [1, 0.8, 1.2, 1],
-              }}
-              transition={{
-                duration: 15,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 md:w-48 md:h-48 bg-blue-500/10 blur-[40px] md:blur-[60px] rounded-full"
-            />
-          </div>
-
-          <div className="inline-block px-2 py-0.5 md:px-3 md:py-1 mb-2 md:mb-3 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em]">
-            رحلة الوعي الداخلي
-          </div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white mb-2 md:mb-3 tracking-tighter leading-tight">
-            استكشف <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">آفاق النمو</span> الذاتي
-          </h2>
-          <p className="text-gray-400 text-xs md:text-sm font-medium max-w-md mx-auto leading-relaxed px-4 md:px-0">
-            محطتك الشاملة للتحكم في صحتك النفسية وتطوير ذاتك. اختر وجهتك التالية في رحلة السلام الداخلي.
-          </p>
-          <div className="flex justify-center gap-1 mt-3 md:mt-4">
-            <div className="w-4 h-1 md:w-6 md:h-1 bg-emerald-500 rounded-full" />
-            <div className="w-1 h-1 md:w-1.5 md:h-1 bg-emerald-500/30 rounded-full" />
-            <div className="w-0.5 h-1 md:w-1 md:h-1 bg-emerald-500/10 rounded-full" />
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Sound Toggle */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-[#181818] p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-white/5 shadow-xl md:shadow-2xl relative overflow-hidden mb-4 md:mb-8 flex items-center justify-between"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-white">
-            {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
-          </div>
-          <div>
-            <h4 className="text-base md:text-lg font-black text-white">الصوت</h4>
-            <p className="text-[10px] md:text-xs text-gray-400 font-bold mt-0.5 md:mt-1">
-              {soundEnabled ? 'تم تفعيل المؤثرات الصوتية' : 'تم تعطيل المؤثرات الصوتية'}
-            </p>
-          </div>
-        </div>
-        <Button 
-          onClick={() => setSoundEnabled(!soundEnabled)}
-          variant={soundEnabled ? "success" : "ghost"}
-          size="sm"
-        >
-          {soundEnabled ? 'تشغيل' : 'إيقاف'}
-        </Button>
-      </motion.div>
-
-      {/* Forgiveness Days Card */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-[#181818] p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-white/5 shadow-xl md:shadow-2xl relative overflow-hidden mb-4 md:mb-8"
-      >
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-          <div>
-            <h4 className="text-base md:text-lg font-black text-white">أيام السماح (Streak Freeze)</h4>
-            <p className="text-[10px] md:text-xs text-gray-400 font-bold mt-0.5 md:mt-1">لديك {stats?.forgivenessDays || 0} أيام سماح متبقية</p>
-          </div>
-          <Button 
-            onClick={useForgivenessDay}
-            disabled={!stats?.forgivenessDays || stats.forgivenessDays === 0}
-            variant="success"
-            size="sm"
-            className="w-full sm:w-auto"
-          >
-            استخدام يوم سماح
-          </Button>
-        </div>
-      </motion.div>
-
       {/* Stats Summary Card */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -221,9 +123,6 @@ export const MenuPage = ({ onNavigate, completedCount, stats, onUpdateStats, onL
                   <h3 className={`font-black text-base sm:text-xl text-white mb-0.5 md:mb-1 group-hover:${menuItem.textColor} transition-colors`}>
                     {menuItem.title}
                   </h3>
-                  <p className="text-[10px] sm:text-sm text-gray-400 font-medium leading-relaxed max-w-[200px] sm:max-w-xs">
-                    {menuItem.description}
-                  </p>
                 </div>
               </div>
               {!menuItem.disabled && <ChevronLeft className="text-gray-500 group-hover:text-white transition-colors w-4 h-4 md:w-6 md:h-6 shrink-0" />}
@@ -252,9 +151,6 @@ export const MenuPage = ({ onNavigate, completedCount, stats, onUpdateStats, onL
                   <h3 className="font-black text-base sm:text-xl text-white mb-0.5 md:mb-1 group-hover:text-indigo-400 transition-colors">
                     تحميل التطبيق (PWA)
                   </h3>
-                  <p className="text-[10px] sm:text-sm text-gray-400 font-medium leading-relaxed max-w-[200px] sm:max-w-xs">
-                    قم بتثبيت التطبيق على جهازك للوصول السريع والعمل بدون إنترنت.
-                  </p>
                 </div>
               </div>
               <ChevronLeft className="text-gray-500 group-hover:text-white transition-colors w-4 h-4 md:w-6 md:h-6 shrink-0" />
@@ -263,15 +159,6 @@ export const MenuPage = ({ onNavigate, completedCount, stats, onUpdateStats, onL
           </motion.div>
         )}
         
-        <Button
-          onClick={onLogout}
-          variant="danger"
-          size="xl"
-          fullWidth
-        >
-          <Lucide.LogOut size={20} />
-          تسجيل الخروج
-        </Button>
       </motion.div>
     </div>
   );

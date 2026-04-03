@@ -779,8 +779,8 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
 
         <div className="max-w-4xl w-full text-center space-y-8 md:space-y-12 relative z-10 py-8">
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-            <h2 className="text-3xl md:text-6xl font-black text-white mb-4">اختر نوع اختبار العادات</h2>
-            <p className="text-gray-400 text-base md:text-xl">حدد مدى عمق التحليل الذي ترغب به لعاداتك اليومية</p>
+            <h2 className="text-3xl md:text-6xl font-black text-gray-900 dark:text-white mb-4">اختر نوع اختبار العادات</h2>
+            <p className="text-gray-500 dark:text-gray-400 text-base md:text-xl">حدد مدى عمق التحليل الذي ترغب به لعاداتك اليومية</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
@@ -788,14 +788,14 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
             <Button
               onClick={() => startActualTest('simple')}
               variant="ghost"
-              className="group relative text-right bg-[#181818] border border-white/5 hover:border-emerald-500/30 p-6 md:p-8 rounded-[2rem] transition-all hover:scale-105 overflow-hidden h-auto flex flex-col items-start"
+              className="group relative text-right bg-white dark:bg-[#181818] border border-gray-200 dark:border-white/5 hover:border-emerald-500/30 p-6 md:p-8 rounded-[2rem] transition-all hover:scale-105 overflow-hidden h-auto flex flex-col items-start shadow-xl"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4 md:mb-6">
                 <Activity size={28} />
               </div>
-              <h3 className="text-xl md:text-2xl font-black text-white mb-2">اختبار بسيط</h3>
-              <p className="text-gray-400 text-sm md:text-base mb-4 md:mb-6 leading-relaxed font-normal">أسئلة سريعة ومختصرة لأهم العادات الأساسية في حياتك.</p>
+              <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white mb-2">اختبار بسيط</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base mb-4 md:mb-6 leading-relaxed font-normal">أسئلة سريعة ومختصرة لأهم العادات الأساسية في حياتك.</p>
               <div className="flex items-center gap-2 text-emerald-400 font-bold bg-emerald-500/10 w-fit px-4 py-2 rounded-full text-sm">
                 <Target size={16} />
                 <span>{simpleCount} سؤال</span>
@@ -806,14 +806,14 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
             <Button
               onClick={() => startActualTest('comprehensive')}
               variant="ghost"
-              className="group relative text-right bg-[#181818] border border-indigo-500/30 hover:border-indigo-500/60 p-6 md:p-6 rounded-[2rem] transition-all hover:scale-105 overflow-hidden shadow-[0_0_30px_rgba(99,102,241,0.1)] h-auto flex flex-col items-start"
+              className="group relative text-right bg-white dark:bg-[#181818] border border-indigo-500/30 hover:border-indigo-500/60 p-6 md:p-6 rounded-[2rem] transition-all hover:scale-105 overflow-hidden shadow-[0_0_30px_rgba(99,102,241,0.1)] h-auto flex flex-col items-start"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-4 md:mb-4">
                 <Brain size={24} className="md:w-7 md:h-7" />
               </div>
-              <h3 className="text-xl md:text-xl font-black text-white mb-2">اختبار احترافي</h3>
-              <p className="text-gray-400 text-sm md:text-sm mb-4 md:mb-4 leading-relaxed font-normal">تحليل شامل وعميق لكل عاداتك اليومية بالتفصيل والدقة.</p>
+              <h3 className="text-xl md:text-xl font-black text-gray-900 dark:text-white mb-2">اختبار احترافي</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm md:text-sm mb-4 md:mb-4 leading-relaxed font-normal">تحليل شامل وعميق لكل عاداتك اليومية بالتفصيل والدقة.</p>
               <div className="flex items-center gap-2 text-indigo-400 font-bold bg-indigo-500/10 w-fit px-4 py-2 rounded-full text-sm">
                 <Sparkles size={16} />
                 <span>{compCount} سؤال</span>
@@ -828,7 +828,7 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
   // --- Renderers ---
   const renderTest = () => {
     const question = allQuestions[currentStep];
-    if (!question || !question.options) return <div className="text-white">خطأ: لم يتم العثور على السؤال أو خياراته</div>;
+    if (!question || !question.options) return <div className="text-gray-900 dark:text-white">خطأ: لم يتم العثور على السؤال أو خياراته</div>;
     const progress = ((currentStep) / allQuestions.length) * 100;
 
     return (
@@ -836,7 +836,7 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[60] bg-[#0a0a0a] flex flex-col overflow-hidden"
+        className="fixed inset-0 z-[60] bg-white dark:bg-[#0a0a0a] flex flex-col overflow-hidden transition-colors duration-300"
       >
         {/* Background Atmosphere */}
         <div className="absolute inset-0 -z-10">
@@ -852,9 +852,9 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
               onClick={handlePrevious} 
               variant="ghost"
               size="sm"
-              className="p-3 hover:bg-white/5 rounded-full transition-all hover:scale-110 active:scale-90 group h-auto"
+              className="p-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-all hover:scale-110 active:scale-90 group h-auto"
             >
-              <ArrowRight size={28} className="text-gray-500 group-hover:text-white" />
+              <ArrowRight size={28} className="text-gray-400 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white" />
             </Button>
           ) : (
             <div className="w-[52px]" /> // Spacer to maintain layout
@@ -866,14 +866,14 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
                 {question.areaTitle}
               </span>
             </div>
-            <div className="relative h-5 bg-white/5 rounded-full overflow-hidden backdrop-blur-sm flex items-center justify-center">
+            <div className="relative h-5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden backdrop-blur-sm flex items-center justify-center">
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
                 transition={{ type: "spring", stiffness: 50, damping: 20 }}
                 className={`absolute top-0 right-0 h-full ${question.areaBg} rounded-full shadow-[0_0_20px_rgba(0,0,0,0.5)]`}
               />
-              <span className="relative z-10 text-[11px] font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+              <span className="relative z-10 text-[11px] font-bold text-gray-900 dark:text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                 {currentStep + 1} / {allQuestions.length}
               </span>
             </div>
@@ -884,7 +884,7 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
               onClick={showFinalResults}
               variant="ghost"
               size="sm"
-              className="text-gray-500 hover:text-white font-bold px-4 hidden md:block"
+              className="text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white font-bold px-4 hidden md:block"
             >
               تخطي الاختبار
             </Button>
@@ -892,9 +892,9 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
               onClick={() => handleSetView('test_selection')} 
               variant="ghost"
               size="sm"
-              className="p-3 hover:bg-white/5 rounded-2xl transition-all hover:scale-110 active:scale-90 group h-auto"
+              className="p-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-2xl transition-all hover:scale-110 active:scale-90 group h-auto"
             >
-              <X size={28} className="text-gray-500 group-hover:text-white" />
+              <X size={28} className="text-gray-400 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white" />
             </Button>
           </div>
         </div>
@@ -1012,7 +1012,7 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 50 }}
-        className="fixed inset-0 z-[60] flex flex-col overflow-hidden"
+        className="fixed inset-0 z-[60] flex flex-col overflow-hidden bg-white dark:bg-[#121212] transition-colors duration-300"
       >
         {/* Header */}
         <div className="flex items-center gap-4 p-4 md:p-6">
@@ -1020,11 +1020,11 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
             onClick={() => handleSetView('test_selection')} 
             variant="ghost"
             size="sm"
-            className="p-2 hover:bg-[#282828] rounded-full transition-colors h-auto"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-[#282828] rounded-full transition-colors h-auto"
           >
-            <X size={24} className="text-[#b3b3b3] hover:text-white" />
+            <X size={24} className="text-gray-400 dark:text-[#b3b3b3] hover:text-gray-900 dark:hover:text-white" />
           </Button>
-          <div className="flex-1 h-3 bg-[#282828] rounded-full overflow-hidden">
+          <div className="flex-1 h-3 bg-gray-100 dark:bg-[#282828] rounded-full overflow-hidden">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: '100%' }}
@@ -1036,20 +1036,20 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col max-w-5xl mx-auto w-full">
           <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
-            <h2 className="text-xl md:text-2xl font-black text-white">نتيجة {activeArea.title}</h2>
+            <h2 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white">نتيجة {activeArea.title}</h2>
           </div>
 
-          <div className={`bg-gradient-to-br from-${activeArea.bg.replace('bg-', '')}/40 to-[#181818] p-5 md:p-8 rounded-2xl md:rounded-[2rem] border border-${activeArea.bg.replace('bg-', '')}/20 flex flex-col items-center text-center relative overflow-hidden`}>
+          <div className={`bg-gradient-to-br from-${activeArea.bg.replace('bg-', '')}/40 to-gray-50 dark:to-[#181818] p-5 md:p-8 rounded-2xl md:rounded-[2rem] border border-${activeArea.bg.replace('bg-', '')}/20 flex flex-col items-center text-center relative overflow-hidden shadow-xl transition-colors duration-300`}>
             <div className={`absolute top-0 right-0 w-48 h-48 md:w-64 md:h-64 ${activeArea.bg.replace('bg-', 'bg-').replace('-500', '-500/10')} rounded-full blur-3xl -z-10`} />
             
             <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full ${activeArea.bg.replace('bg-', 'bg-').replace('-500', '-500/20')} ${activeArea.color} flex items-center justify-center mb-3 md:mb-4`}>
               {activeArea.icon ? <activeArea.icon className="w-8 h-8 md:w-10 md:h-10" /> : null}
             </div>
-            <h3 className="text-lg md:text-xl font-bold text-gray-300 mb-1 md:mb-2">{activeArea.title}</h3>
+            <h3 className="text-lg md:text-xl font-bold text-gray-600 dark:text-gray-300 mb-1 md:mb-2">{activeArea.title}</h3>
             <div className={`text-5xl md:text-6xl font-black ${activeArea.color} mb-3 md:mb-4`}>
               {score}%
             </div>
-            <p className="text-gray-400 text-sm md:text-base max-w-md mb-8">
+            <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base max-w-md mb-8">
               {score === 100 ? 'أداء ممتاز! عاداتك في هذا الجانب صحية جداً.' :
                score >= 50 ? 'أداء جيد، لكن هناك مجال للتحسين والتطوير.' :
                'تحتاج إلى وقفة جادة لتحسين عاداتك في هذا الجانب.'}
@@ -1067,7 +1067,7 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
         </div>
 
         {/* Fixed Buttons */}
-        <div className="p-6 md:p-12 border-t border-white/10 bg-[#121212]">
+        <div className="p-6 md:p-12 border-t border-gray-200 dark:border-white/10 bg-white dark:bg-[#121212] transition-colors duration-300">
           <div className="max-w-2xl mx-auto w-full">
             {nextArea ? (
               <Button 
@@ -1318,7 +1318,7 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
 
           {/* Fixed Continue Button */}
           {onComplete && (
-            <div className="w-full mt-auto border-t border-white/5 bg-[#0a0a0a]/90 backdrop-blur-xl relative z-[70]">
+            <div className="w-full mt-auto border-t border-gray-200 dark:border-white/5 bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl relative z-[70] transition-colors duration-300">
               <div className="p-6 md:p-12 max-w-2xl mx-auto w-full pb-10 md:pb-12">
                 <Button
                   onClick={handleContinue}
@@ -1358,7 +1358,7 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[60] flex flex-col overflow-hidden"
+        className="fixed inset-0 z-[60] flex flex-col overflow-hidden bg-white dark:bg-[#0a0a0a] transition-colors duration-300"
       >
         {/* Atmospheric Background */}
         <div className={`absolute inset-0 ${isBadMode ? 'bg-rose-600 opacity-20' : 'bg-emerald-500 opacity-10'} blur-[100px] pointer-events-none`} />
@@ -1372,18 +1372,18 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
             }} 
             variant="ghost"
             size="sm"
-            className="p-2 hover:bg-white/10 rounded-full transition-colors h-auto"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors h-auto"
           >
-            <ArrowRight size={24} className="text-[#b3b3b3] hover:text-white" />
+            <ArrowRight size={24} className="text-gray-400 dark:text-[#b3b3b3] hover:text-gray-900 dark:hover:text-white" />
           </Button>
-          <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+          <div className="flex-1 h-1.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${((habitStep + 1) / currentHabitsList.length) * 100}%` }}
               className={`h-full ${isBadMode ? 'bg-rose-500' : 'bg-emerald-500'} rounded-full shadow-[0_0_10px_rgba(255,255,255,0.2)]`}
             />
           </div>
-          <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+          <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
             {habitStep + 1} / {currentHabitsList.length}
           </div>
         </div>
@@ -1393,7 +1393,7 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
             <motion.span 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className={`px-6 py-2 rounded-xl bg-gradient-to-r ${isBadMode ? 'from-red-500/20 via-red-600/20 to-red-500/20 text-red-100 border-red-500/30 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : 'from-emerald-500/20 via-emerald-600/20 to-emerald-500/20 text-emerald-100 border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.3)]'} font-black text-lg border animate-pulse`}
+              className={`px-6 py-2 rounded-xl bg-gradient-to-r ${isBadMode ? 'from-red-500/20 via-red-600/20 to-red-500/20 text-red-900 dark:text-red-100 border-red-500/30 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : 'from-emerald-500/20 via-emerald-600/20 to-emerald-500/20 text-emerald-900 dark:text-emerald-100 border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.3)]'} font-black text-lg border animate-pulse`}
             >
               {habit.habit}
             </motion.span>
@@ -1409,12 +1409,12 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
                     className="bg-orange-500/[0.05] border border-orange-500/10 p-6 md:p-8 rounded-3xl backdrop-blur-md"
                   >
                     <div className="flex items-center gap-4 mb-6">
-                      <div className="w-12 h-12 rounded-2xl bg-orange-500/20 flex items-center justify-center text-orange-400">
+                      <div className="w-12 h-12 rounded-2xl bg-orange-500/20 flex items-center justify-center text-orange-600 dark:text-orange-400">
                         <AlertCircle size={24} />
                       </div>
-                      <h3 className="text-xl font-black text-orange-400 tracking-tight">الضرر الناتج</h3>
+                      <h3 className="text-xl font-black text-orange-600 dark:text-orange-400 tracking-tight">الضرر الناتج</h3>
                     </div>
-                    <p className="text-orange-100/70 text-base md:text-xl leading-relaxed font-medium">{habit.harm}</p>
+                    <p className="text-orange-900/70 dark:text-orange-100/70 text-base md:text-xl leading-relaxed font-medium">{habit.harm}</p>
                   </motion.div>
                 )}
 
@@ -1426,12 +1426,12 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
                     className="bg-rose-500/[0.05] border border-rose-500/10 p-6 md:p-8 rounded-3xl backdrop-blur-md"
                   >
                     <div className="flex items-center gap-4 mb-6">
-                      <div className="w-12 h-12 rounded-2xl bg-rose-500/20 flex items-center justify-center text-rose-400">
+                      <div className="w-12 h-12 rounded-2xl bg-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-400">
                         <ShieldAlert size={24} />
                       </div>
-                      <h3 className="text-xl font-black text-rose-400 tracking-tight">العاقبة والوعيد</h3>
+                      <h3 className="text-xl font-black text-rose-600 dark:text-rose-400 tracking-tight">العاقبة والوعيد</h3>
                     </div>
-                    <p className="text-rose-100/70 text-base md:text-xl leading-relaxed font-medium">{habit.punishment}</p>
+                    <p className="text-rose-900/70 dark:text-rose-100/70 text-base md:text-xl leading-relaxed font-medium">{habit.punishment}</p>
                   </motion.div>
                 )}
 
@@ -1442,12 +1442,12 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
                   className="bg-emerald-500/[0.03] border border-emerald-500/10 p-6 md:p-8 rounded-3xl backdrop-blur-md shadow-xl"
                 >
                   <div className="flex items-center gap-4 mb-6">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                       <Sparkles size={24} />
                     </div>
-                    <h3 className="text-xl font-black text-emerald-400 tracking-tight">خطوات التحسين والتعافي</h3>
+                    <h3 className="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">خطوات التحسين والتعافي</h3>
                   </div>
-                  <p className="text-emerald-100/80 text-base md:text-xl leading-relaxed font-medium">{'solution' in habit ? habit.solution : ''}</p>
+                  <p className="text-emerald-900/80 dark:text-emerald-100/80 text-base md:text-xl leading-relaxed font-medium">{'solution' in habit ? habit.solution : ''}</p>
                 </motion.div>
               </>
             ) : (
@@ -1459,12 +1459,12 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
                   className="bg-emerald-500/[0.03] border border-emerald-500/10 p-6 md:p-8 rounded-3xl backdrop-blur-md shadow-xl"
                 >
                   <div className="flex items-center gap-4 mb-6">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                       <Sparkles size={24} />
                     </div>
-                    <h3 className="text-xl font-black text-emerald-400 tracking-tight">النفع</h3>
+                    <h3 className="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">النفع</h3>
                   </div>
-                  <p className="text-emerald-100/80 text-base md:text-xl leading-relaxed font-medium">{'benefit' in habit ? habit.benefit : ''}</p>
+                  <p className="text-emerald-900/80 dark:text-emerald-100/80 text-base md:text-xl leading-relaxed font-medium">{'benefit' in habit ? habit.benefit : ''}</p>
                 </motion.div>
 
                 <motion.div 
@@ -1474,19 +1474,19 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
                   className="bg-blue-500/[0.03] border border-blue-500/10 p-6 md:p-8 rounded-3xl backdrop-blur-md shadow-xl"
                 >
                   <div className="flex items-center gap-4 mb-6">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-400">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
                       <ShieldAlert size={24} />
                     </div>
-                    <h3 className="text-xl font-black text-blue-400 tracking-tight">الاستمرارية والثبات</h3>
+                    <h3 className="text-xl font-black text-blue-600 dark:text-blue-400 tracking-tight">الاستمرارية والثبات</h3>
                   </div>
-                  <p className="text-blue-100/80 text-base md:text-xl leading-relaxed font-medium">{'consistency' in habit ? habit.consistency : ''}</p>
+                  <p className="text-blue-900/80 dark:text-blue-100/80 text-base md:text-xl leading-relaxed font-medium">{'consistency' in habit ? habit.consistency : ''}</p>
                 </motion.div>
               </>
             )}
           </div>
         </div>
         {/* Fixed Buttons */}
-        <div className="p-4 md:p-4 border-t border-white/10 bg-[#0a0a0a]/90 backdrop-blur-xl relative z-10 pb-4 md:pb-4 mt-auto">
+        <div className="p-4 md:p-4 border-t border-gray-200 dark:border-white/10 bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl relative z-10 pb-4 md:pb-4 mt-auto transition-colors duration-300">
           <div className="flex gap-4 max-w-3xl mx-auto w-full">
             <Button
               onClick={() => setHabitStep(prev => prev - 1)}

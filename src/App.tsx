@@ -39,6 +39,8 @@ import { LearningPath } from './components/LearningPath';
 import { LessonFlow } from './components/LessonFlow';
 import { FullRoadmap } from './components/FullRoadmap';
 import { MenuPage } from './components/MenuPage';
+import { StorePage } from './components/StorePage';
+import { SettingsPage } from './components/SettingsPage';
 import { AboutPage } from './components/AboutPage';
 import { CharactersModal } from './components/CharactersModal';
 import { CertificateModal } from './components/CertificateModal';
@@ -56,7 +58,7 @@ import { playPop, playLevelUp } from './utils/sounds';
 import confetti from 'canvas-confetti';
 import { Button } from './components/ui/Button';
 
-type TabType = 'tasks' | 'tools' | 'roadmap' | 'certificates' | 'menu' | 'about' | 'habits' | 'abilities';
+type TabType = 'tasks' | 'tools' | 'roadmap' | 'certificates' | 'menu' | 'about' | 'habits' | 'abilities' | 'settings' | 'store';
 type PostOnboardingStep = 'none' | 'habits_intro' | 'habits_test' | 'results';
 
 export default function App() {
@@ -143,15 +145,30 @@ export default function App() {
   const [showCharactersModal, setShowCharactersModal] = useState(false);
   const [level, setLevel] = useState(() => parseInt(localStorage.getItem('level') || '1'));
   const [xp, setXp] = useState(() => parseInt(localStorage.getItem('xp') || '0'));
-  const [ownedCharacters, setOwnedCharacters] = useState<string[]>(() => {
-    const saved = localStorage.getItem('ownedCharacters');
-    if (saved) return JSON.parse(saved);
-    // Default owned characters are the ones that don't have a price
-    return USER_CHARACTERS.filter(c => !c.price).map(c => c.id);
-  });
-  const [activeCharacterId, setActiveCharacterId] = useState(() => {
-    return localStorage.getItem('activeCharacterId') || 'c1';
-  });
+  const [ownedCharacters, setOwnedCharacters] = useState<string[]>(() => JSON.parse(localStorage.getItem('ownedCharacters') || '["char1"]'));
+  const [activeCharacterId, setActiveCharacterId] = useState(() => localStorage.getItem('activeCharacterId_v2') || 'char1');
+
+  useEffect(() => {
+    localStorage.setItem('ownedCharacters', JSON.stringify(ownedCharacters));
+  }, [ownedCharacters]);
+
+  useEffect(() => {
+    localStorage.setItem('activeCharacterId_v2', activeCharacterId);
+  }, [activeCharacterId]);
+
+  const handlePurchaseCharacter = (id: string, price: number) => {
+    if (xp >= price) {
+      setXp(prev => prev - price);
+      setOwnedCharacters(prev => [...prev, id]);
+      return true;
+    }
+    return false;
+  };
+
+  const handleEquipCharacter = (id: string) => {
+    setActiveCharacterId(id);
+  };
+  
   const [showCertificate, setShowCertificate] = useState(false);
   const [completedPathName, setCompletedPathName] = useState('');
   const [showUnitCelebration, setShowUnitCelebration] = useState(false);
@@ -162,6 +179,15 @@ export default function App() {
   const [showPointsModal, setShowPointsModal] = useState(false);
   const [stats, setStats] = useState(() => JSON.parse(localStorage.getItem('userStats') || '{"lessonsCompleted": 0, "perfectQuizzes": 0, "currentStreak": 0, "pathsCompleted": 0, "totalXP": 0, "lastActiveDate": "", "forgivenessDays": 3}'));
   const [userName, setUserName] = useState(() => localStorage.getItem('userName') || '');
+  const [visibleTabs, setVisibleTabs] = useState<string[]>(() => {
+    const saved = localStorage.getItem('visibleTabs');
+    return saved ? JSON.parse(saved) : ['habits', 'tasks', 'abilities', 'menu'];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('visibleTabs', JSON.stringify(visibleTabs));
+  }, [visibleTabs]);
+
   const currentPathIndex = LEARNING_PATHS.findIndex(p => p.id === activePathId);
   const currentPath = LEARNING_PATHS[currentPathIndex !== -1 ? currentPathIndex : 0];
   const pathColor = PATH_COLORS[currentPathIndex !== -1 ? currentPathIndex % PATH_COLORS.length : 0];
@@ -206,11 +232,9 @@ export default function App() {
     localStorage.setItem('xp', xp.toString());
     localStorage.setItem('userStats', JSON.stringify({ ...stats, totalXP: xp }));
     localStorage.setItem('userName', userName);
-    localStorage.setItem('ownedCharacters', JSON.stringify(ownedCharacters));
-    localStorage.setItem('activeCharacterId', activeCharacterId);
-  }, [pathProgress, level, xp, stats, userName, ownedCharacters, activeCharacterId]);
+  }, [pathProgress, level, xp, stats, userName]);
 
-  const currentCharacter = USER_CHARACTERS.find(c => c.id === activeCharacterId) || USER_CHARACTERS[0];
+  const currentCharacter = USER_CHARACTERS.find(c => c.level === level) || USER_CHARACTERS[USER_CHARACTERS.length - 1];
   
   // Map icon string to actual Lucide component
   const getIconComponent = (iconName: string) => {
@@ -239,15 +263,7 @@ export default function App() {
     y.setDate(y.getDate() - 1);
     const yesterday = `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, '0')}-${String(y.getDate()).padStart(2, '0')}`;
 
-    setXp(prev => {
-      const newXp = prev + xpGained;
-      // Check for level up
-      const newLevel = Math.floor(1 + Math.sqrt(newXp / 100)); // Simple level formula
-      if (newLevel > level) {
-        setLevel(newLevel);
-      }
-      return newXp;
-    });
+    setXp(prev => prev + xpGained);
     
     setStats(prev => {
       let newStreak = prev.currentStreak || 0;
@@ -321,35 +337,27 @@ export default function App() {
     playPop();
   };
 
-  const purchaseCharacter = (characterId: string, price: number) => {
-    if (xp >= price) {
-      setXp(prev => prev - price);
-      setOwnedCharacters(prev => [...prev, characterId]);
-      triggerConfetti('#FFD700');
-      playLevelUp();
-      return true;
-    }
-    return false;
-  };
-
-  const equipCharacter = (characterId: string) => {
-    setActiveCharacterId(characterId);
-    playPop();
-  };
-
   const totalSteps = LEARNING_PATHS.reduce((acc, path) => acc + path.units.flatMap(u => u.lessons).length, 0);
   const completedCount = LEARNING_PATHS.reduce((acc, path) => acc + (pathProgress[path.id] || 0), 0);
   const progress = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
   
-  // Calculate progress within the current level
+  // Calculate progress within the current level based on requirements
   const levelProgress = useMemo(() => {
-    const xpForCurrentLevel = Math.pow(level - 1, 2) * 100;
-    const xpForNextLevel = Math.pow(level, 2) * 100;
-    const xpInLevel = xp - xpForCurrentLevel;
-    const xpRequired = xpForNextLevel - xpForCurrentLevel;
-    
-    return Math.min(1, Math.max(0, xpInLevel / xpRequired));
-  }, [level, xp]);
+    const nextLevel = level + 1;
+    const nextChar = USER_CHARACTERS.find(c => c.level === nextLevel);
+    if (!nextChar || !nextChar.requirements) return 0;
+
+    const req = nextChar.requirements;
+    const xpProgress = Math.min(1, xp / req.xp);
+    const lessonsProgress = Math.min(1, (stats.lessonsCompleted || 0) / req.lessons);
+    const pathsProgress = req.paths > 0 
+      ? Math.min(1, (stats.pathsCompleted || 0) / req.paths)
+      : 1;
+
+    const totalReqs = req.paths > 0 ? 3 : 2;
+    const progressSum = xpProgress + lessonsProgress + (req.paths > 0 ? pathsProgress : 0);
+    return progressSum / totalReqs;
+  }, [level, xp, stats]);
 
   // Dynamic character style based on progress
   const characterStyle = {
@@ -380,7 +388,7 @@ export default function App() {
 
   useEffect(() => {
     // Gamification logic: Level up when levelProgress reaches 100%
-    if (levelProgress >= 1) {
+    if (levelProgress >= 1 && level < USER_CHARACTERS.length) {
       const nextLevel = level + 1;
       setLevel(nextLevel);
       playLevelUp();
@@ -399,12 +407,15 @@ export default function App() {
     }
   }, [showUnitCelebration, showCertificate, activePathId]);
 
-  const tabs = [
-    { id: 'habits', label: 'عاداتي', icon: <Activity size={20} /> },
-    { id: 'tasks', label: 'الرئيسية', icon: <Home size={20} /> },
-    { id: 'abilities', label: 'قدراتي', icon: <Brain size={20} /> },
-    { id: 'menu', label: 'القائمة', icon: <Menu size={20} /> },
-  ] as const;
+  const tabs = useMemo(() => {
+    const allTabs = [
+      { id: 'habits', label: 'عاداتي', icon: <Activity size={20} /> },
+      { id: 'tasks', label: 'الرئيسية', icon: <Home size={20} /> },
+      { id: 'abilities', label: 'قدراتي', icon: <Brain size={20} /> },
+      { id: 'menu', label: 'القائمة', icon: <Menu size={20} /> },
+    ] as const;
+    return allTabs.filter(tab => visibleTabs.includes(tab.id));
+  }, [visibleTabs]);
 
   const earnedAchievementsCount = [
     (stats.lessonsCompleted || 0) >= 1,
@@ -555,7 +566,7 @@ export default function App() {
           {/* Header */}
           {(activeTab !== 'habits' || habitsView === 'test_selection' || habitsView === 'results') && 
            (activeTab !== 'abilities' || abilitiesView === 'dashboard' || abilitiesView === 'library') &&
-           activeTab !== 'about' && (
+           activeTab !== 'about' && activeTab !== 'settings' && activeTab !== 'store' && activeTab !== 'certificates' && (
             <header className="sticky top-0 z-40 bg-[#121212]/40 backdrop-blur-2xl border-b border-white/5 transition-all duration-300">
               <div className="max-w-6xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
                 <motion.div 
@@ -571,16 +582,7 @@ export default function App() {
                 >
                   <div className={`w-8 h-8 md:w-9 md:h-9 ${activePathColor.bg} rounded-lg flex items-center justify-center text-black shadow-2xl relative overflow-hidden transition-transform group-hover:rotate-3`}>
                     <div className={`absolute inset-0 opacity-40 ${activePathColor.gradientFrom}`} />
-                    {currentCharacter.image ? (
-                      <img 
-                        src={currentCharacter.image} 
-                        alt={currentCharacter.name} 
-                        className="w-full h-full object-cover relative z-10"
-                        referrerPolicy="no-referrer"
-                      />
-                    ) : (
-                      <CharacterIcon size={16} className="md:w-4 md:h-4 relative z-10" />
-                    )}
+                    <CharacterIcon size={16} className="md:w-4 md:h-4 relative z-10" />
                   </div>
                   <div className="flex flex-col items-start justify-center">
                     <div className="flex items-center gap-1.5">
@@ -725,12 +727,24 @@ export default function App() {
                 onNavigate={(tab) => setActiveTab(tab as TabType)}
                 completedCount={completedCount}
                 stats={stats}
-                onUpdateStats={setStats}
-                onLogout={handleLogout}
                 isInstallable={isInstallable}
                 onInstall={handleInstallClick}
+              />
+            )}
+            {activeTab === 'store' && (
+              <StorePage 
+                onBack={() => setActiveTab('menu')}
+                stats={stats}
+                onUpdateStats={setStats}
+              />
+            )}
+            {activeTab === 'settings' && (
+              <SettingsPage 
+                onBack={() => setActiveTab('menu')}
                 soundEnabled={soundEnabled}
                 setSoundEnabled={setSoundEnabled}
+                visibleTabs={visibleTabs}
+                setVisibleTabs={setVisibleTabs}
               />
             )}
             {activeTab === 'about' && (
@@ -738,6 +752,7 @@ export default function App() {
             )}
             {activeTab === 'certificates' && (
               <CertificatesPage 
+                onBack={() => setActiveTab('menu')}
                 pathProgress={pathProgress}
                 userName={userName}
                 onUpdateName={setUserName}
@@ -763,7 +778,7 @@ export default function App() {
         postOnboardingStep === 'none' && 
         (activeTab !== 'habits' || habitsView === 'test_selection' || habitsView === 'results') && 
         (activeTab !== 'abilities' || abilitiesView === 'dashboard' || abilitiesView === 'library') &&
-        activeTab !== 'about') && (
+        activeTab !== 'about' && activeTab !== 'settings' && activeTab !== 'store' && activeTab !== 'certificates') && (
         <nav className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[450px] bg-[#1a2e26] backdrop-blur-3xl border border-white/10 z-50 p-2 flex justify-between items-center shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-3xl gap-2">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
@@ -808,8 +823,9 @@ export default function App() {
         stats={stats}
         ownedCharacters={ownedCharacters}
         activeCharacterId={activeCharacterId}
-        onPurchase={purchaseCharacter}
-        onEquip={equipCharacter}
+        onPurchase={handlePurchaseCharacter}
+        onEquip={handleEquipCharacter}
+        onUpdateStats={setStats}
       />
 
       <AnimatePresence>
@@ -911,7 +927,7 @@ export default function App() {
         isOpen={showLevelUpModal}
         onClose={() => setShowLevelUpModal(false)}
         level={level}
-        character={currentCharacter}
+        character={USER_CHARACTERS.find(c => c.level === level) || USER_CHARACTERS[0]}
       />
           </motion.div>
         )}

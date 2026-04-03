@@ -13,6 +13,7 @@ import { Button } from './ui/Button';
 import confetti from 'canvas-confetti';
 import { playPop, playLevelUp } from '../utils/sounds';
 import { playChildVoice } from '../utils/voice';
+import { PrayerBenefitsPage } from './PrayerBenefitsPage';
 
 interface HabitTask {
   id: string;
@@ -485,6 +486,36 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
   const [celebrationMessage, setCelebrationMessage] = useState<string | null>(null);
   const [idleMessage, setIdleMessage] = useState<string | null>(null);
   const celebrationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const [showBenefits, setShowBenefits] = useState(false);
+
+  const [joinDate, setJoinDate] = useState(() => {
+    const saved = localStorage.getItem('user_join_date');
+    if (!saved) {
+      const now = new Date().toISOString();
+      localStorage.setItem('user_join_date', now);
+      return now;
+    }
+    return saved;
+  });
+
+  const [monthlyPrayerCount, setMonthlyPrayerCount] = useState(() => {
+    const saved = localStorage.getItem('monthly_prayer_count');
+    const lastMonth = localStorage.getItem('monthly_prayer_month');
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    const monthKey = `${currentYear}-${currentMonth}`;
+    
+    if (lastMonth !== monthKey) {
+      localStorage.setItem('monthly_prayer_month', monthKey);
+      localStorage.setItem('monthly_prayer_count', '0');
+      return 0;
+    }
+    return saved ? parseInt(saved) : 0;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('monthly_prayer_count', monthlyPrayerCount.toString());
+  }, [monthlyPrayerCount]);
 
   // Idle messages logic
   useEffect(() => {
@@ -599,6 +630,44 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
               const willBeCompleted = !task.completed;
               if (willBeCompleted) {
                 justCompleted = true;
+                if (categoryId === 'prayers') {
+                  setMonthlyPrayerCount(prev => prev + 1);
+                  // Detailed tracking
+                  const stats = JSON.parse(localStorage.getItem('prayer_stats') || '{"total":0, "monthly":0, "fajr":0, "dhuhr":0, "asr":0, "maghrib":0, "isha":0, "azkar_morning":0, "azkar_evening":0}');
+                  stats.total += 1;
+                  stats.monthly += 1;
+                  if (taskId === 'p1') stats.fajr += 1;
+                  if (taskId === 'p2') stats.dhuhr += 1;
+                  if (taskId === 'p3') stats.asr += 1;
+                  if (taskId === 'p4') stats.maghrib += 1;
+                  if (taskId === 'p5') stats.isha += 1;
+                  localStorage.setItem('prayer_stats', JSON.stringify(stats));
+                }
+                if (categoryId === 'azkar') {
+                  const stats = JSON.parse(localStorage.getItem('prayer_stats') || '{"total":0, "monthly":0, "fajr":0, "dhuhr":0, "asr":0, "maghrib":0, "isha":0, "azkar_morning":0, "azkar_evening":0}');
+                  if (taskId === 'az1') stats.azkar_morning += 1;
+                  if (taskId === 'az2') stats.azkar_evening += 1;
+                  localStorage.setItem('prayer_stats', JSON.stringify(stats));
+                }
+              } else {
+                if (categoryId === 'prayers') {
+                  setMonthlyPrayerCount(prev => Math.max(0, prev - 1));
+                  const stats = JSON.parse(localStorage.getItem('prayer_stats') || '{"total":0, "monthly":0, "fajr":0, "dhuhr":0, "asr":0, "maghrib":0, "isha":0, "azkar_morning":0, "azkar_evening":0}');
+                  stats.total = Math.max(0, stats.total - 1);
+                  stats.monthly = Math.max(0, stats.monthly - 1);
+                  if (taskId === 'p1') stats.fajr = Math.max(0, stats.fajr - 1);
+                  if (taskId === 'p2') stats.dhuhr = Math.max(0, stats.dhuhr - 1);
+                  if (taskId === 'p3') stats.asr = Math.max(0, stats.asr - 1);
+                  if (taskId === 'p4') stats.maghrib = Math.max(0, stats.maghrib - 1);
+                  if (taskId === 'p5') stats.isha = Math.max(0, stats.isha - 1);
+                  localStorage.setItem('prayer_stats', JSON.stringify(stats));
+                }
+                if (categoryId === 'azkar') {
+                  const stats = JSON.parse(localStorage.getItem('prayer_stats') || '{"total":0, "monthly":0, "fajr":0, "dhuhr":0, "asr":0, "maghrib":0, "isha":0, "azkar_morning":0, "azkar_evening":0}');
+                  if (taskId === 'az1') stats.azkar_morning = Math.max(0, stats.azkar_morning - 1);
+                  if (taskId === 'az2') stats.azkar_evening = Math.max(0, stats.azkar_evening - 1);
+                  localStorage.setItem('prayer_stats', JSON.stringify(stats));
+                }
               }
               return { ...task, completed: willBeCompleted };
             }
@@ -679,7 +748,7 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                 initial={{ opacity: 0, y: -20, scale: 0.8 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: 0.8 }}
-                className="absolute top-full mt-2 md:mt-3 left-1/2 -translate-x-1/2 bg-white text-purple-600 px-4 py-2 md:px-5 md:py-2 rounded-2xl font-black text-sm md:text-lg shadow-[0_0_30px_rgba(168,85,247,0.4)] z-50 whitespace-nowrap"
+                className="absolute top-full mt-2 md:mt-3 left-1/2 -translate-x-1/2 bg-white dark:bg-purple-600 text-purple-600 dark:text-white px-4 py-2 md:px-5 md:py-2 rounded-2xl font-black text-sm md:text-lg shadow-[0_0_30px_rgba(168,85,247,0.4)] z-50 whitespace-nowrap transition-colors duration-300"
               >
                 {isCelebrating ? celebrationMessage : idleMessage}
               </motion.div>
@@ -688,20 +757,20 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
         </motion.div>
 
         <div className="mt-4 text-center">
-          <h3 className="text-2xl md:text-3xl font-black text-white mb-2 md:mb-3">مرحلة التطوير الذاتي</h3>
-          <p className="text-gray-400 text-xs md:text-base max-w-xl mx-auto leading-relaxed mb-6">أنا مدربك الشخصي، سأساعدك في بناء عاداتك الجديدة خطوة بخطوة</p>
+          <h3 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white mb-2 md:mb-3">مرحلة التطوير الذاتي</h3>
+          <p className="text-gray-500 dark:text-gray-400 text-xs md:text-base max-w-xl mx-auto leading-relaxed mb-6">أنا مدربك الشخصي، سأساعدك في بناء عاداتك الجديدة خطوة بخطوة</p>
           
           <div className="flex items-center justify-center gap-2">
             <button 
               onClick={() => setIsDropdownOpen(true)}
-              className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-3 rounded-full text-white transition-all"
+              className="inline-flex items-center gap-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 px-6 py-3 rounded-full text-gray-900 dark:text-white transition-all"
             >
               <span className="font-bold">{activeRoutine.title}</span>
               <ChevronDown size={18} className="text-gray-400" />
             </button>
             <button 
               onClick={() => setIsProgressOpen(true)}
-              className="inline-flex items-center gap-2 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 px-4 py-3 rounded-full text-purple-300 transition-all"
+              className="inline-flex items-center gap-2 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 px-4 py-3 rounded-full text-purple-600 dark:text-purple-300 transition-all"
             >
               <TrendingUp size={18} />
             </button>
@@ -720,15 +789,15 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
               setSelectedCategory(cat);
               setShowTasks(true);
             }}
-            className="flex flex-col items-center gap-3 md:gap-4 p-4 md:p-6 rounded-[2rem] md:rounded-[2.5rem] bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] transition-all group relative overflow-hidden"
+            className="flex flex-col items-center gap-3 md:gap-4 p-4 md:p-6 rounded-[2rem] md:rounded-[2.5rem] bg-white dark:bg-white/[0.03] border border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-all group relative overflow-hidden shadow-sm dark:shadow-none"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-500/5 dark:from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             
             <div className="relative w-12 h-12 md:w-24 md:h-24 flex items-center justify-center">
-              <svg className="w-full h-full -rotate-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" viewBox="0 0 80 80">
+              <svg className="w-full h-full -rotate-90 drop-shadow-[0_0_15px_rgba(0,0,0,0.05)] dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" viewBox="0 0 80 80">
                 <circle
                   cx="40" cy="40" r="36"
-                  className="stroke-white/5 fill-none"
+                  className="stroke-gray-100 dark:stroke-white/5 fill-none"
                   strokeWidth="5"
                 />
                 <motion.circle
@@ -746,10 +815,10 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
               </div>
             </div>
             <div className="text-center overflow-hidden w-full relative z-10">
-              <span className="text-[10px] md:text-xs font-black text-white/40 uppercase tracking-tighter md:tracking-[0.15em] block mb-1 md:mb-2 truncate">{cat.title}</span>
+              <span className="text-[10px] md:text-xs font-black text-gray-400 dark:text-white/40 uppercase tracking-tighter md:tracking-[0.15em] block mb-1 md:mb-2 truncate">{cat.title}</span>
               <div className="flex items-center justify-center gap-1">
-                <span className="text-sm md:text-2xl font-black text-white">{cat.current}/{cat.target}</span>
-                <span className="text-[10px] md:text-xs text-white/20 font-medium">{cat.unit}</span>
+                <span className="text-sm md:text-2xl font-black text-gray-900 dark:text-white">{cat.current}/{cat.target}</span>
+                <span className="text-[10px] md:text-xs text-gray-400 dark:text-white/20 font-medium">{cat.unit}</span>
               </div>
             </div>
           </motion.button>
@@ -764,9 +833,9 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-[#121212] z-[130] p-6 overflow-y-auto"
+              className="fixed inset-0 bg-white dark:bg-[#121212] z-[130] p-6 overflow-y-auto transition-colors duration-300"
             >
-              <div className="text-white">
+              <div className="text-gray-900 dark:text-white">
                 <ProgressPage routines={routines} onClose={() => setIsProgressOpen(false)} />
               </div>
             </motion.div>
@@ -792,18 +861,18 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                 animate={{ y: 0 }}
                 exit={{ y: '100%' }}
                 transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="fixed bottom-0 left-0 right-0 bg-[#121212] border-t border-white/10 rounded-t-[3rem] z-[120] p-6 max-h-[80vh] overflow-y-auto"
+                className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 rounded-t-[3rem] z-[120] p-6 max-h-[80vh] overflow-y-auto transition-colors duration-300"
               >
-                <div className="w-12 h-1.5 bg-white/10 rounded-full mx-auto mb-6" />
+                <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/10 rounded-full mx-auto mb-6" />
                 
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h4 className="text-xl font-black text-white">اختر الروتين</h4>
-                    <p className="text-gray-500 text-sm mt-1">اختر مجموعة العادات التي ترغب في التركيز عليها</p>
+                    <h4 className="text-xl font-black text-gray-900 dark:text-white">اختر الروتين</h4>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">اختر مجموعة العادات التي ترغب في التركيز عليها</p>
                   </div>
                   <button 
                     onClick={() => setIsDropdownOpen(false)}
-                    className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                    className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 flex items-center justify-center text-gray-900 dark:text-white transition-colors"
                   >
                     <X size={18} />
                   </button>
@@ -832,7 +901,7 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                         className={`w-full p-4 rounded-2xl border transition-all text-right relative overflow-hidden ${
                           isSelected 
                             ? 'bg-purple-500/10 border-purple-500/30' 
-                            : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.05]'
+                            : 'bg-gray-50 dark:bg-white/[0.03] border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/[0.05]'
                         }`}
                       >
                         <div className="flex items-start justify-between mb-3">
@@ -840,23 +909,23 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                             {isSelected ? <CheckCircle2 size={24} /> : <Circle size={24} />}
                           </div>
                           <div className="flex-1">
-                            <h5 className={`font-bold text-lg ${isSelected ? 'text-purple-400' : 'text-white'}`}>
+                            <h5 className={`font-bold text-lg ${isSelected ? 'text-purple-600 dark:text-purple-400' : 'text-gray-900 dark:text-white'}`}>
                               {routine.title}
                             </h5>
-                            <p className="text-gray-400 text-xs mt-1 leading-relaxed">
+                            <p className="text-gray-500 dark:text-gray-400 text-xs mt-1 leading-relaxed">
                               {routine.description}
                             </p>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-3">
-                          <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                          <div className="flex-1 h-2 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
                             <div 
                               className={`h-full rounded-full transition-all duration-1000 ${isSelected ? 'bg-purple-500' : 'bg-emerald-500'}`}
                               style={{ width: `${progressPercent}%` }}
                             />
                           </div>
-                          <span className={`text-xs font-bold ${isSelected ? 'text-purple-400' : 'text-emerald-500'}`}>
+                          <span className={`text-xs font-bold ${isSelected ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-500'}`}>
                             {progressPercent}%
                           </span>
                         </div>
@@ -888,9 +957,9 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed bottom-0 left-0 right-0 bg-[#121212] border-t border-white/10 rounded-t-[3rem] z-[120] p-6 max-h-[80vh] overflow-y-auto"
+              className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 rounded-t-[3rem] z-[120] p-6 max-h-[80vh] overflow-y-auto transition-colors duration-300"
             >
-              <div className="w-12 h-1.5 bg-white/10 rounded-full mx-auto mb-4" />
+              <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/10 rounded-full mx-auto mb-4" />
               
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
@@ -898,17 +967,78 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                     <selectedCategory.icon size={20} />
                   </div>
                   <div>
-                    <h4 className="text-lg font-black text-white">{selectedCategory.title}</h4>
-                    <p className="text-gray-500 text-xs text-right">أكمل المهام لزيادة تقدمك اليومي</p>
+                    <h4 className="text-lg font-black text-gray-900 dark:text-white">{selectedCategory.title}</h4>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs text-right">أكمل المهام لزيادة تقدمك اليومي</p>
                   </div>
                 </div>
                 <button 
                   onClick={() => handleCloseTasks()}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                  className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 flex items-center justify-center text-gray-900 dark:text-white transition-colors"
                 >
                   <X size={18} />
                 </button>
               </div>
+
+              {selectedCategory.id === 'prayers' && (() => {
+                const now = new Date();
+                const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+                const currentDay = now.getDate();
+                
+                const joinDateObj = new Date(joinDate);
+                const isFirstMonth = joinDateObj.getMonth() === now.getMonth() && joinDateObj.getFullYear() === now.getFullYear();
+                
+                let totalMonthlyPrayers;
+                if (isFirstMonth) {
+                  const remainingDays = (daysInMonth - joinDateObj.getDate()) + 1;
+                  totalMonthlyPrayers = remainingDays * 5;
+                } else {
+                  totalMonthlyPrayers = daysInMonth * 5;
+                }
+                
+                const monthlyProgress = Math.round((monthlyPrayerCount / totalMonthlyPrayers) * 100);
+                const remainingDaysCount = daysInMonth - currentDay;
+                
+                return (
+                  <div className="mb-6 bg-black/20 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 backdrop-blur-sm w-full">
+                    <div className="flex items-center">
+                      <div className="flex-1 text-center space-y-1">
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className="text-xl sm:text-2xl md:text-3xl font-black text-white">{monthlyProgress}%</span>
+                        </div>
+                        <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold flex items-center justify-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                          إنجاز الشهر
+                        </p>
+                      </div>
+                      
+                      <div className="h-10 md:h-12 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+                      
+                      <div className="flex-1 text-center space-y-1">
+                        <div className="flex items-baseline justify-center gap-1.5">
+                          <span className="text-xl sm:text-2xl md:text-3xl font-black text-indigo-400">{monthlyPrayerCount}</span>
+                          <span className="text-gray-500 text-sm sm:text-base font-bold">/ {totalMonthlyPrayers}</span>
+                        </div>
+                        <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold flex items-center justify-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                          الصلوات
+                        </p>
+                      </div>
+
+                      <div className="h-10 md:h-12 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+                      
+                      <div className="flex-1 text-center space-y-1">
+                        <div className="flex items-baseline justify-center gap-1.5">
+                          <span className="text-xl sm:text-2xl md:text-3xl font-black text-emerald-400">{remainingDaysCount}</span>
+                        </div>
+                        <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold flex items-center justify-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          أيام متبقية
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div className="space-y-3">
                 {selectedCategory.tasks.map((task) => (
@@ -919,16 +1049,16 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                     className={`w-full p-4 rounded-2xl border transition-all flex items-center justify-between text-right ${
                       task.completed 
                         ? 'bg-emerald-500/10 border-emerald-500/20' 
-                        : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.05]'
+                        : 'bg-gray-50 dark:bg-white/[0.03] border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/[0.05]'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                        task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-white/10'
+                        task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-200 dark:border-white/10'
                       }`}>
                         {task.completed && <Check size={14} strokeWidth={3} />}
                       </div>
-                      <span className={`font-bold text-sm ${task.completed ? 'text-emerald-500' : 'text-white'}`}>
+                      <span className={`font-bold text-sm ${task.completed ? 'text-emerald-600 dark:text-emerald-500' : 'text-gray-900 dark:text-white'}`}>
                         {task.title}
                       </span>
                     </div>
@@ -948,11 +1078,11 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                       boxShadow: ["0px 0px 0px rgba(234,179,8,0)", "0px 0px 20px rgba(234,179,8,0.3)", "0px 0px 0px rgba(234,179,8,0)"] 
                     } : {}}
                     transition={{ repeat: Infinity, duration: 2 }}
-                    className={`mt-4 p-4 rounded-[1.5rem] border relative overflow-hidden ${isCompleted ? 'bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/50' : 'bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-white/5'}`}
+                    className={`mt-4 p-4 rounded-[1.5rem] border relative overflow-hidden ${isCompleted ? 'bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/50' : 'bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-gray-200 dark:border-white/5'}`}
                   >
                     {/* Progress Bar Background */}
                     <div 
-                      className="absolute top-0 right-0 bottom-0 bg-white/5 transition-all duration-1000 ease-out" 
+                      className="absolute top-0 right-0 bottom-0 bg-gray-900/5 dark:bg-white/5 transition-all duration-1000 ease-out" 
                       style={{ width: `${progressPercent}%` }} 
                     />
                     
@@ -962,15 +1092,15 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                           <Trophy size={20} />
                         </div>
                         <div>
-                          <p className="text-white font-bold text-sm">مكافأة الاستمرار</p>
-                          <p className={`${isCompleted ? 'text-yellow-200/80' : 'text-gray-500'} text-[10px]`}>
+                          <p className="text-gray-900 dark:text-white font-bold text-sm">مكافأة الاستمرار</p>
+                          <p className={`${isCompleted ? 'text-yellow-700 dark:text-yellow-200/80' : 'text-gray-500'} text-[10px]`}>
                             {isClaimed ? 'تم تحصيل المكافأة بنجاح!' : 'أكمل جميع المهام لتحصل على 50 نقطة XP'}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
                         {isClaimed ? (
-                          <span className="text-sm font-black text-yellow-500 flex items-center gap-1 bg-yellow-500/10 px-3 py-1.5 rounded-full">
+                          <span className="text-sm font-black text-yellow-600 dark:text-yellow-500 flex items-center gap-1 bg-yellow-500/10 px-3 py-1.5 rounded-full">
                             <Check size={16} strokeWidth={3} /> تم
                           </span>
                         ) : isCompleted ? (
@@ -981,7 +1111,7 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                             تحصيل
                           </button>
                         ) : (
-                          <span className="text-xl font-black text-white">
+                          <span className="text-xl font-black text-gray-900 dark:text-white">
                             {progressPercent}%
                           </span>
                         )}
@@ -990,13 +1120,30 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                     
                     {/* Thin Progress line at the bottom */}
                     {!isCompleted && (
-                      <div className="absolute bottom-0 right-0 left-0 h-1 bg-white/5">
+                      <div className="absolute bottom-0 right-0 left-0 h-1 bg-gray-900/5 dark:bg-white/5">
                         <div className="h-full bg-blue-500 transition-all duration-1000 ease-out" style={{ width: `${progressPercent}%` }} />
                       </div>
                     )}
                   </motion.div>
                 );
               })()}
+
+              {selectedCategory.id === 'prayers' && (
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowBenefits(true)}
+                  className="mt-6 w-full p-4 rounded-2xl bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center gap-3 text-indigo-400 font-black hover:from-indigo-500/30 hover:to-purple-500/30 transition-all"
+                >
+                  <BookOpen size={20} />
+                  <span>الأجر والفوائد</span>
+                </motion.button>
+              )}
+
+              <AnimatePresence>
+                {showBenefits && (
+                  <PrayerBenefitsPage onClose={() => setShowBenefits(false)} />
+                )}
+              </AnimatePresence>
             </motion.div>
           </>
         )}

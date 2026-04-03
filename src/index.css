@@ -4,6 +4,7 @@
 @theme {
   --font-sans: "Plus Jakarta Sans", "Tajawal", -apple-system, BlinkMacSystemFont, "SF Pro Arabic", "SF Pro Display", ui-sans-serif, system-ui, sans-serif;
   --font-script: "Dancing Script", cursive;
+  --dark-mode: selector;
 }
 
 @layer base {
@@ -11,20 +12,19 @@
     direction: rtl;
     font-family: "Plus Jakarta Sans", "Tajawal", -apple-system, BlinkMacSystemFont, sans-serif;
     scroll-behavior: smooth;
-    background-color: #121212; /* Spotify deep dark */
   }
   
   body {
-    @apply bg-[#121212] text-white;
+    @apply bg-white text-gray-900 dark:bg-[#121212] dark:text-white transition-colors duration-300;
   }
 }
 
 @layer utilities {
   .glass-panel {
-    @apply bg-[#1c1c1e]/80 backdrop-blur-2xl border border-white/10 shadow-2xl;
+    @apply bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur-2xl border border-gray-200 dark:border-white/10 shadow-2xl;
   }
   .glass-panel-dark {
-    @apply bg-black/80 backdrop-blur-2xl border border-white/10 shadow-2xl;
+    @apply bg-gray-900/80 dark:bg-black/80 backdrop-blur-2xl border border-white/10 shadow-2xl;
   }
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-l from-emerald-400 to-teal-500;
@@ -103,7 +103,7 @@
                 radial-gradient(circle at 100% 100%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
   }
   .glass-card {
-    @apply bg-white/[0.03] backdrop-blur-xl border border-white/10 shadow-2xl;
+    @apply bg-gray-50/50 dark:bg-white/[0.03] backdrop-blur-xl border border-gray-200 dark:border-white/10 shadow-2xl;
   }
 }
 

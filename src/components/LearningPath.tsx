@@ -150,7 +150,7 @@ export const LearningPath: React.FC<LearningPathProps> = ({
         </div>
         
         {/* Unit Progress Bar */}
-        <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
+        <div className="w-full h-2 bg-gray-200 dark:bg-white/5 rounded-full overflow-hidden border border-gray-200 dark:border-white/5">
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${(unitProg / activeUnit.lessons.length) * 100}%` }}
@@ -178,17 +178,17 @@ export const LearningPath: React.FC<LearningPathProps> = ({
                 variant="ghost"
                 className={`w-full relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-5 flex items-center gap-4 md:gap-6 border transition-all duration-300 h-auto ${
                   isActive 
-                    ? `border-white/20 shadow-2xl ${color.shadow} scale-[1.02] z-10 bg-[#282828]` 
+                    ? `border-gray-200 dark:border-white/20 shadow-2xl ${color.shadow} scale-[1.02] z-10 bg-gray-50 dark:bg-[#282828]` 
                     : isCompleted 
-                      ? 'bg-[#282828]/40 border-white/5 opacity-80' 
-                      : 'bg-[#181818] border-white/5'
-                } cursor-pointer hover:bg-[#282828] group`}
+                      ? 'bg-gray-100/50 dark:bg-[#282828]/40 border-gray-200 dark:border-white/5 opacity-80' 
+                      : 'bg-gray-50 dark:bg-[#181818] border-gray-200 dark:border-white/5'
+                } cursor-pointer hover:bg-gray-100 dark:hover:bg-[#282828] group`}
               >
                 {/* Icon Container */}
                 <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 border transition-transform group-hover:scale-110 ${
                   isActive ? `${color.bg} text-black border-transparent` : 
-                  isCompleted ? `${color.lightBg} ${color.text} border-white/10` : 
-                  'bg-white/5 text-white/20 border-white/5'
+                  isCompleted ? `${color.lightBg} ${color.text} border-gray-200 dark:border-white/10` : 
+                  'bg-gray-200 dark:bg-white/5 text-gray-400 dark:text-white/20 border-gray-200 dark:border-white/5'
                 }`}>
                   {isCompleted ? <Check size={24} className="md:w-7 md:h-7" /> :
                    getIcon(step.icon, 24)}
@@ -197,23 +197,23 @@ export const LearningPath: React.FC<LearningPathProps> = ({
                 {/* Content */}
                 <div className="flex-1 text-right">
                   <div className="flex items-center justify-between mb-1">
-                    <h4 className={`font-bold text-base md:text-lg ${isActive ? 'text-white' : 'text-gray-200'}`}>
+                    <h4 className={`font-bold text-base md:text-lg ${isActive ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-200'}`}>
                       {step.title}
                     </h4>
                     {isCompleted && (
-                        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-white/10 text-white/40">
+                        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-white/40">
                           مكتمل
                         </span>
                     )}
                   </div>
-                  <p className={`text-xs md:text-sm ${isActive ? 'text-white/70' : 'text-gray-400'} font-normal line-clamp-1`}>
+                  <p className={`text-xs md:text-sm ${isActive ? 'text-gray-600 dark:text-white/70' : 'text-gray-500 dark:text-gray-400'} font-normal line-clamp-1`}>
                     {step.description || 'تعلم مهارات جديدة في هذا الدرس'}
                   </p>
                 </div>
 
                 {/* Action Icon */}
                 {!isCompleted && (
-                  <div className={`${isActive ? color.text : 'text-white/20'} transition-colors`}>
+                  <div className={`${isActive ? color.text : 'text-gray-300 dark:text-white/20'} transition-colors`}>
                     <Play size={20} className={isActive ? 'animate-pulse' : ''} />
                   </div>
                 )}
@@ -234,26 +234,26 @@ export const LearningPath: React.FC<LearningPathProps> = ({
             variant="ghost"
             className={`w-full relative overflow-hidden rounded-xl md:rounded-2xl p-6 md:p-8 flex flex-col items-center gap-4 md:gap-6 border transition-all duration-300 h-auto ${
               unitProg >= (Array.isArray(steps) ? steps.length : 0)
-                ? `border-purple-500/30 shadow-2xl shadow-purple-500/10 scale-[1.02] bg-[#282828] cursor-pointer hover:bg-[#333]`
-                : 'bg-[#181818] border-white/5 opacity-50 cursor-not-allowed'
+                ? `border-purple-500/30 shadow-2xl shadow-purple-500/10 scale-[1.02] bg-white dark:bg-[#282828] cursor-pointer hover:bg-gray-50 dark:hover:bg-[#333]`
+                : 'bg-gray-100 dark:bg-[#181818] border-gray-200 dark:border-white/5 opacity-50 cursor-not-allowed'
             }`}
           >
             <div className={`w-14 h-14 md:w-20 md:h-20 rounded-2xl md:rounded-3xl flex items-center justify-center shrink-0 border ${
               unitProg >= (Array.isArray(steps) ? steps.length : 0)
-                ? 'bg-purple-500 text-white border-transparent shadow-[0_0_30px_rgba(168,85,247,0.4)]'
-                : 'bg-white/5 text-white/20 border-white/5'
+                ? 'bg-purple-500 text-white border-transparent shadow-[0_0_30_rgba(168,85,247,0.4)]'
+                : 'bg-gray-200 dark:bg-white/5 text-gray-400 dark:text-white/20 border-gray-200 dark:border-white/5'
             }`}>
               <Trophy size={32} className="md:w-10 md:h-10" />
             </div>
             <div className="flex-1 text-center">
-              <h4 className={`font-bold text-xl md:text-2xl ${unitProg >= (Array.isArray(steps) ? steps.length : 0) ? 'text-white' : 'text-[#b3b3b3]'}`}>
+              <h4 className={`font-bold text-xl md:text-2xl ${unitProg >= (Array.isArray(steps) ? steps.length : 0) ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-[#b3b3b3]'}`}>
                 شهادة إتمام الوحدة
               </h4>
-              <p className="text-sm md:text-base text-[#b3b3b3]/50 mt-2">
+              <p className="text-sm md:text-base text-gray-500 dark:text-[#b3b3b3]/50 mt-2">
                 احصل على شهادتك بعد إكمال جميع الدروس
               </p>
             </div>
-            {unitProg < (Array.isArray(steps) ? steps.length : 0) && <Lock size={20} className="text-white/20 md:w-6 md:h-6" />}
+            {unitProg < (Array.isArray(steps) ? steps.length : 0) && <Lock size={20} className="text-gray-300 dark:text-white/20 md:w-6 md:h-6" />}
           </Button>
         </motion.div>
       </div>

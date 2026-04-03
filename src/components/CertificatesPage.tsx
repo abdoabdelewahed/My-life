@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
-import { Trophy, Download, Award, Edit2, Save, ShieldCheck, QrCode } from 'lucide-react';
+import { Trophy, Download, Award, Edit2, Save, ShieldCheck, QrCode, ChevronLeft } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { toPng } from 'html-to-image';
 import { LEARNING_PATHS, PATH_COLORS } from '../constants';
@@ -10,6 +10,7 @@ interface CertificatesPageProps {
   pathProgress: Record<string, number>;
   userName: string;
   onUpdateName: (name: string) => void;
+  onBack: () => void;
 }
 
 interface CertificateCardProps {
@@ -228,7 +229,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
   );
 };
 
-export const CertificatesPage: React.FC<CertificatesPageProps> = ({ pathProgress, userName, onUpdateName }) => {
+export const CertificatesPage: React.FC<CertificatesPageProps> = ({ pathProgress, userName, onUpdateName, onBack }) => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState(userName);
   const [activeTab, setActiveTab] = useState<'all' | 'path' | 'unit'>('all');
@@ -295,7 +296,12 @@ export const CertificatesPage: React.FC<CertificatesPageProps> = ({ pathProgress
   return (
     <div className="space-y-6 md:space-y-10 px-2 md:px-0" dir="rtl">
       <div className="sticky top-0 z-20 bg-[#121212] flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 mb-6 md:mb-10 pb-4 border-b border-white/5">
-        <h2 className="text-2xl md:text-3xl font-black text-white">شهاداتك</h2>
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <Button onClick={onBack} variant="ghost" size="sm" className="p-2">
+            <ChevronLeft size={24} />
+          </Button>
+          <h2 className="text-2xl md:text-3xl font-black text-white">شهاداتك</h2>
+        </div>
         
         {/* Tabs */}
         <div className="flex p-1 bg-white/5 border border-white/10 rounded-xl md:rounded-2xl w-full md:w-auto overflow-x-auto hide-scrollbar">

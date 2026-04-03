@@ -19,11 +19,11 @@ export const Button = ({
   ...props
 }: ButtonProps) => {
   const variants = {
-    primary: 'bg-white text-black hover:bg-gray-100 shadow-xl shadow-white/5',
-    success: 'bg-[#1DB954] text-black hover:bg-[#1ed760] shadow-xl shadow-[#1DB954]/20',
-    secondary: 'bg-white/10 text-white hover:bg-white/20 border border-white/10',
-    outline: 'bg-transparent text-white border border-white/20 hover:bg-white/5',
-    ghost: 'bg-transparent text-gray-400 hover:text-white hover:bg-white/5',
+    primary: 'bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 shadow-xl shadow-black/5 dark:shadow-white/5',
+    success: 'bg-[#1DB954] text-white dark:text-black hover:bg-[#1ed760] shadow-xl shadow-[#1DB954]/20',
+    secondary: 'bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 border border-gray-200 dark:border-white/10',
+    outline: 'bg-transparent text-gray-900 dark:text-white border border-gray-200 dark:border-white/20 hover:bg-gray-50 dark:hover:bg-white/5',
+    ghost: 'bg-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5',
     danger: 'bg-rose-500 text-white hover:bg-rose-600 shadow-xl shadow-rose-500/20',
   };
 
