@@ -957,187 +957,193 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 rounded-t-[3rem] z-[120] p-6 max-h-[80vh] overflow-y-auto transition-colors duration-300"
+              className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/10 rounded-t-[3rem] z-[120] flex flex-col max-h-[92vh] transition-colors duration-300"
             >
-              <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/10 rounded-full mx-auto mb-4" />
-              
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-xl ${selectedCategory.bg} flex items-center justify-center ${selectedCategory.color}`}>
-                    <selectedCategory.icon size={20} />
+              <div className="p-6 pb-2">
+                <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/10 rounded-full mx-auto mb-4" />
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-xl ${selectedCategory.bg} flex items-center justify-center ${selectedCategory.color}`}>
+                      <selectedCategory.icon size={20} />
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-black text-gray-900 dark:text-white">{selectedCategory.title}</h4>
+                      <p className="text-gray-500 dark:text-gray-400 text-xs text-right">أكمل المهام لزيادة تقدمك اليومي</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-lg font-black text-gray-900 dark:text-white">{selectedCategory.title}</h4>
-                    <p className="text-gray-500 dark:text-gray-400 text-xs text-right">أكمل المهام لزيادة تقدمك اليومي</p>
-                  </div>
+                  <button 
+                    onClick={() => handleCloseTasks()}
+                    className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 flex items-center justify-center text-gray-900 dark:text-white transition-colors"
+                  >
+                    <X size={18} />
+                  </button>
                 </div>
-                <button 
-                  onClick={() => handleCloseTasks()}
-                  className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 flex items-center justify-center text-gray-900 dark:text-white transition-colors"
-                >
-                  <X size={18} />
-                </button>
               </div>
 
-              {selectedCategory.id === 'prayers' && (() => {
-                const now = new Date();
-                const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-                const currentDay = now.getDate();
-                
-                const joinDateObj = new Date(joinDate);
-                const isFirstMonth = joinDateObj.getMonth() === now.getMonth() && joinDateObj.getFullYear() === now.getFullYear();
-                
-                let totalMonthlyPrayers;
-                if (isFirstMonth) {
-                  const remainingDays = (daysInMonth - joinDateObj.getDate()) + 1;
-                  totalMonthlyPrayers = remainingDays * 5;
-                } else {
-                  totalMonthlyPrayers = daysInMonth * 5;
-                }
-                
-                const monthlyProgress = Math.round((monthlyPrayerCount / totalMonthlyPrayers) * 100);
-                const remainingDaysCount = daysInMonth - currentDay;
-                
-                return (
-                  <div className="mb-6 bg-black/20 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 backdrop-blur-sm w-full">
-                    <div className="flex items-center">
-                      <div className="flex-1 text-center space-y-1">
-                        <div className="flex items-baseline justify-center gap-1">
-                          <span className="text-xl sm:text-2xl md:text-3xl font-black text-white">{monthlyProgress}%</span>
+              <div className="flex-1 overflow-y-auto p-6 pt-2 space-y-6">
+                {selectedCategory.id === 'prayers' && (() => {
+                  const now = new Date();
+                  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+                  const currentDay = now.getDate();
+                  
+                  const joinDateObj = new Date(joinDate);
+                  const isFirstMonth = joinDateObj.getMonth() === now.getMonth() && joinDateObj.getFullYear() === now.getFullYear();
+                  
+                  let totalMonthlyPrayers;
+                  if (isFirstMonth) {
+                    const remainingDays = (daysInMonth - joinDateObj.getDate()) + 1;
+                    totalMonthlyPrayers = remainingDays * 5;
+                  } else {
+                    totalMonthlyPrayers = daysInMonth * 5;
+                  }
+                  
+                  const monthlyProgress = Math.round((monthlyPrayerCount / totalMonthlyPrayers) * 100);
+                  const remainingDaysCount = daysInMonth - currentDay;
+                  
+                  return (
+                    <div className="bg-black/20 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 backdrop-blur-sm w-full">
+                      <div className="flex items-center">
+                        <div className="flex-1 text-center space-y-1">
+                          <div className="flex items-baseline justify-center gap-1">
+                            <span className="text-xl sm:text-2xl md:text-3xl font-black text-white">{monthlyProgress}%</span>
+                          </div>
+                          <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold flex items-center justify-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                            إنجاز الشهر
+                          </p>
                         </div>
-                        <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold flex items-center justify-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                          إنجاز الشهر
-                        </p>
-                      </div>
-                      
-                      <div className="h-10 md:h-12 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
-                      
-                      <div className="flex-1 text-center space-y-1">
-                        <div className="flex items-baseline justify-center gap-1.5">
-                          <span className="text-xl sm:text-2xl md:text-3xl font-black text-indigo-400">{monthlyPrayerCount}</span>
-                          <span className="text-gray-500 text-sm sm:text-base font-bold">/ {totalMonthlyPrayers}</span>
+                        
+                        <div className="h-10 md:h-12 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+                        
+                        <div className="flex-1 text-center space-y-1">
+                          <div className="flex items-baseline justify-center gap-1.5">
+                            <span className="text-xl sm:text-2xl md:text-3xl font-black text-indigo-400">{monthlyPrayerCount}</span>
+                            <span className="text-gray-500 text-sm sm:text-base font-bold">/ {totalMonthlyPrayers}</span>
+                          </div>
+                          <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold flex items-center justify-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                            الصلوات
+                          </p>
                         </div>
-                        <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold flex items-center justify-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                          الصلوات
-                        </p>
-                      </div>
 
-                      <div className="h-10 md:h-12 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
-                      
-                      <div className="flex-1 text-center space-y-1">
-                        <div className="flex items-baseline justify-center gap-1.5">
-                          <span className="text-xl sm:text-2xl md:text-3xl font-black text-emerald-400">{remainingDaysCount}</span>
-                        </div>
-                        <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold flex items-center justify-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                          أيام متبقية
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              <div className="space-y-3">
-                {selectedCategory.tasks.map((task) => (
-                  <motion.button
-                    key={task.id}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => handleToggleTask(selectedCategory.id, task.id)}
-                    className={`w-full p-4 rounded-2xl border transition-all flex items-center justify-between text-right ${
-                      task.completed 
-                        ? 'bg-emerald-500/10 border-emerald-500/20' 
-                        : 'bg-gray-50 dark:bg-white/[0.03] border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/[0.05]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                        task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-200 dark:border-white/10'
-                      }`}>
-                        {task.completed && <Check size={14} strokeWidth={3} />}
-                      </div>
-                      <span className={`font-bold text-sm ${task.completed ? 'text-emerald-600 dark:text-emerald-500' : 'text-gray-900 dark:text-white'}`}>
-                        {task.title}
-                      </span>
-                    </div>
-                  </motion.button>
-                ))}
-              </div>
-
-              {(() => {
-                const progressPercent = Math.min(100, Math.round((selectedCategory.current / selectedCategory.target) * 100));
-                const isCompleted = progressPercent >= 100;
-                const isClaimed = selectedCategory.rewardClaimed;
-
-                return (
-                  <motion.div 
-                    animate={isCompleted && !isClaimed ? { 
-                      scale: [1, 1.02, 1], 
-                      boxShadow: ["0px 0px 0px rgba(234,179,8,0)", "0px 0px 20px rgba(234,179,8,0.3)", "0px 0px 0px rgba(234,179,8,0)"] 
-                    } : {}}
-                    transition={{ repeat: Infinity, duration: 2 }}
-                    className={`mt-4 p-4 rounded-[1.5rem] border relative overflow-hidden ${isCompleted ? 'bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/50' : 'bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-gray-200 dark:border-white/5'}`}
-                  >
-                    {/* Progress Bar Background */}
-                    <div 
-                      className="absolute top-0 right-0 bottom-0 bg-gray-900/5 dark:bg-white/5 transition-all duration-1000 ease-out" 
-                      style={{ width: `${progressPercent}%` }} 
-                    />
-                    
-                    <div className="relative z-10 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isCompleted ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.5)]' : 'bg-yellow-500/20 text-yellow-500'}`}>
-                          <Trophy size={20} />
-                        </div>
-                        <div>
-                          <p className="text-gray-900 dark:text-white font-bold text-sm">مكافأة الاستمرار</p>
-                          <p className={`${isCompleted ? 'text-yellow-700 dark:text-yellow-200/80' : 'text-gray-500'} text-[10px]`}>
-                            {isClaimed ? 'تم تحصيل المكافأة بنجاح!' : 'أكمل جميع المهام لتحصل على 50 نقطة XP'}
+                        <div className="h-10 md:h-12 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+                        
+                        <div className="flex-1 text-center space-y-1">
+                          <div className="flex items-baseline justify-center gap-1.5">
+                            <span className="text-xl sm:text-2xl md:text-3xl font-black text-emerald-400">{remainingDaysCount}</span>
+                          </div>
+                          <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold flex items-center justify-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            أيام متبقية
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        {isClaimed ? (
-                          <span className="text-sm font-black text-yellow-600 dark:text-yellow-500 flex items-center gap-1 bg-yellow-500/10 px-3 py-1.5 rounded-full">
-                            <Check size={16} strokeWidth={3} /> تم
-                          </span>
-                        ) : isCompleted ? (
-                          <button 
-                            onClick={() => handleClaimReward(selectedCategory.id)} 
-                            className="bg-yellow-500 hover:bg-yellow-400 text-black font-black text-xs px-4 py-2 rounded-full shadow-[0_0_15px_rgba(234,179,8,0.4)] transition-all active:scale-95"
-                          >
-                            تحصيل
-                          </button>
-                        ) : (
-                          <span className="text-xl font-black text-gray-900 dark:text-white">
-                            {progressPercent}%
-                          </span>
-                        )}
-                      </div>
                     </div>
-                    
-                    {/* Thin Progress line at the bottom */}
-                    {!isCompleted && (
-                      <div className="absolute bottom-0 right-0 left-0 h-1 bg-gray-900/5 dark:bg-white/5">
-                        <div className="h-full bg-blue-500 transition-all duration-1000 ease-out" style={{ width: `${progressPercent}%` }} />
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })()}
+                  );
+                })()}
 
-              {selectedCategory.id === 'prayers' && (
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowBenefits(true)}
-                  className="mt-6 w-full p-4 rounded-2xl bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center gap-3 text-indigo-400 font-black hover:from-indigo-500/30 hover:to-purple-500/30 transition-all"
-                >
-                  <BookOpen size={20} />
-                  <span>الأجر والفوائد</span>
-                </motion.button>
-              )}
+                <div className="space-y-3">
+                  {selectedCategory.tasks.map((task) => (
+                    <motion.button
+                      key={task.id}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleToggleTask(selectedCategory.id, task.id)}
+                      className={`w-full p-4 rounded-2xl border transition-all flex items-center justify-between text-right ${
+                        task.completed 
+                          ? 'bg-emerald-500/10 border-emerald-500/20' 
+                          : 'bg-gray-50 dark:bg-white/[0.03] border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/[0.05]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                          task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-200 dark:border-white/10'
+                        }`}>
+                          {task.completed && <Check size={14} strokeWidth={3} />}
+                        </div>
+                        <span className={`font-bold text-sm ${task.completed ? 'text-emerald-600 dark:text-emerald-500' : 'text-gray-900 dark:text-white'}`}>
+                          {task.title}
+                        </span>
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-6 pt-2 border-t border-gray-100 dark:border-white/5 bg-white dark:bg-[#121212]">
+                {(() => {
+                  const progressPercent = Math.min(100, Math.round((selectedCategory.current / selectedCategory.target) * 100));
+                  const isCompleted = progressPercent >= 100;
+                  const isClaimed = selectedCategory.rewardClaimed;
+
+                  return (
+                    <motion.div 
+                      animate={isCompleted && !isClaimed ? { 
+                        scale: [1, 1.02, 1], 
+                        boxShadow: ["0px 0px 0px rgba(234,179,8,0)", "0px 0px 20px rgba(234,179,8,0.3)", "0px 0px 0px rgba(234,179,8,0)"] 
+                      } : {}}
+                      transition={{ repeat: Infinity, duration: 2 }}
+                      className={`p-4 rounded-[1.5rem] border relative overflow-hidden ${isCompleted ? 'bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/50' : 'bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-gray-200 dark:border-white/5'}`}
+                    >
+                      {/* Progress Bar Background */}
+                      <div 
+                        className="absolute top-0 right-0 bottom-0 bg-gray-900/5 dark:bg-white/5 transition-all duration-1000 ease-out" 
+                        style={{ width: `${progressPercent}%` }} 
+                      />
+                      
+                      <div className="relative z-10 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isCompleted ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.5)]' : 'bg-yellow-500/20 text-yellow-500'}`}>
+                            <Trophy size={20} />
+                          </div>
+                          <div>
+                            <p className="text-gray-900 dark:text-white font-bold text-sm">مكافأة الاستمرار</p>
+                            <p className={`${isCompleted ? 'text-yellow-700 dark:text-yellow-200/80' : 'text-gray-500'} text-[10px]`}>
+                              {isClaimed ? 'تم تحصيل المكافأة بنجاح!' : 'أكمل جميع المهام لتحصل على 50 نقطة XP'}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          {isClaimed ? (
+                            <span className="text-sm font-black text-yellow-600 dark:text-yellow-500 flex items-center gap-1 bg-yellow-500/10 px-3 py-1.5 rounded-full">
+                              <Check size={16} strokeWidth={3} /> تم
+                            </span>
+                          ) : isCompleted ? (
+                            <button 
+                              onClick={() => handleClaimReward(selectedCategory.id)} 
+                              className="bg-yellow-500 hover:bg-yellow-400 text-black font-black text-xs px-4 py-2 rounded-full shadow-[0_0_15px_rgba(234,179,8,0.4)] transition-all active:scale-95"
+                            >
+                              تحصيل
+                            </button>
+                          ) : (
+                            <span className="text-xl font-black text-gray-900 dark:text-white">
+                              {progressPercent}%
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Thin Progress line at the bottom */}
+                      {!isCompleted && (
+                        <div className="absolute bottom-0 right-0 left-0 h-1 bg-gray-900/5 dark:bg-white/5">
+                          <div className="h-full bg-blue-500 transition-all duration-1000 ease-out" style={{ width: `${progressPercent}%` }} />
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })()}
+
+                {selectedCategory.id === 'prayers' && (
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowBenefits(true)}
+                    className="mt-3 w-full p-4 rounded-2xl bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center gap-3 text-indigo-400 font-black hover:from-indigo-500/30 hover:to-purple-500/30 transition-all"
+                  >
+                    <BookOpen size={20} />
+                    <span>الأجر والفوائد</span>
+                  </motion.button>
+                )}
+              </div>
 
               <AnimatePresence>
                 {showBenefits && (
