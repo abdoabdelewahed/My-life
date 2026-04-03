@@ -34,8 +34,8 @@ export const SettingsPage = ({
 
   const pages = [
     { id: 'tasks', label: 'الرئيسية', icon: <Lucide.Home size={20} /> },
+    { id: 'routine', label: 'روتيني', icon: <Lucide.Activity size={20} /> },
     { id: 'abilities', label: 'القدرات', icon: <Lucide.Brain size={20} /> },
-    { id: 'habits', label: 'العادات', icon: <Lucide.Activity size={20} /> },
   ];
 
   return (

@@ -48,17 +48,17 @@ import { CertificatesPage } from './components/CertificatesPage';
 import { AchievementsModal } from './components/AchievementsModal';
 import { LevelUpModal } from './components/LevelUpModal';
 import { HabitsPage } from './components/HabitsPage';
+import RoutinePage from './components/RoutinePage';
 import { StreakModal } from './components/StreakModal';
 import { PointsModal } from './components/PointsModal';
 import AbilitiesPage from './components/AbilitiesPage';
-import { ImprovementPhase, CharacterSVG } from './components/ImprovementPhase';
 import { playChildVoice } from './utils/voice';
 import { LEARNING_PATHS, USER_CHARACTERS, PATH_COLORS } from './constants';
 import { playPop, playLevelUp } from './utils/sounds';
 import confetti from 'canvas-confetti';
 import { Button } from './components/ui/Button';
 
-type TabType = 'tasks' | 'tools' | 'roadmap' | 'certificates' | 'menu' | 'about' | 'habits' | 'abilities' | 'settings' | 'store';
+type TabType = 'tasks' | 'tools' | 'roadmap' | 'certificates' | 'menu' | 'about' | 'habits' | 'abilities' | 'settings' | 'store' | 'routine';
 type PostOnboardingStep = 'none' | 'habits_intro' | 'habits_test' | 'results';
 
 export default function App() {
@@ -68,7 +68,7 @@ export default function App() {
     if (completed === 'true') return 'none';
     return (localStorage.getItem('postOnboardingStep') as PostOnboardingStep) || 'none';
   });
-  const [activeTab, setActiveTab] = useState<TabType>('habits');
+  const [activeTab, setActiveTab] = useState<TabType>('tasks');
   const [activePathId, setActivePathId] = useState<string>(() => localStorage.getItem('activePathId') || LEARNING_PATHS[0].id);
   const [expandedPathId, setExpandedPathId] = useState<string | null>(LEARNING_PATHS[0].id);
   const [pathProgress, setPathProgress] = useState<Record<string, number>>(() => JSON.parse(localStorage.getItem('pathProgress') || '{}'));
@@ -86,7 +86,7 @@ export default function App() {
     localStorage.removeItem('userName');
     setShowOnboarding(true);
     setPostOnboardingStep('none');
-    setActiveTab('habits');
+    setActiveTab('tasks');
   };
 
   const handleOnboardingComplete = () => {
@@ -181,7 +181,7 @@ export default function App() {
   const [userName, setUserName] = useState(() => localStorage.getItem('userName') || '');
   const [visibleTabs, setVisibleTabs] = useState<string[]>(() => {
     const saved = localStorage.getItem('visibleTabs');
-    return saved ? JSON.parse(saved) : ['habits', 'tasks', 'abilities', 'menu'];
+    return saved ? JSON.parse(saved) : ['tasks', 'routine', 'abilities', 'menu'];
   });
 
   useEffect(() => {
@@ -409,8 +409,8 @@ export default function App() {
 
   const tabs = useMemo(() => {
     const allTabs = [
-      { id: 'habits', label: 'عاداتي', icon: <Activity size={20} /> },
       { id: 'tasks', label: 'الرئيسية', icon: <Home size={20} /> },
+      { id: 'routine', label: 'روتيني', icon: <Activity size={20} /> },
       { id: 'abilities', label: 'قدراتي', icon: <Brain size={20} /> },
       { id: 'menu', label: 'القائمة', icon: <Menu size={20} /> },
     ] as const;
@@ -566,7 +566,7 @@ export default function App() {
           {/* Header */}
           {(activeTab !== 'habits' || habitsView === 'test_selection' || habitsView === 'results') && 
            (activeTab !== 'abilities' || abilitiesView === 'dashboard' || abilitiesView === 'library') &&
-           activeTab !== 'about' && activeTab !== 'settings' && activeTab !== 'store' && activeTab !== 'certificates' && (
+           activeTab !== 'about' && activeTab !== 'settings' && activeTab !== 'store' && activeTab !== 'certificates' && activeTab !== 'routine' && (
             <header className="sticky top-0 z-40 bg-[#121212]/40 backdrop-blur-2xl border-b border-white/5 transition-all duration-300">
               <div className="max-w-6xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
                 <motion.div 
@@ -683,7 +683,7 @@ export default function App() {
         </header>
       )}
 
-      <main className={(activeTab === 'about' || activeTab === 'habits' || (activeTab === 'abilities' && abilitiesView === 'results')) ? 'w-full' : 'max-w-6xl mx-auto px-4 py-6 md:py-8'}>
+      <main className={(activeTab === 'about' || activeTab === 'routine' || (activeTab === 'abilities' && (abilitiesView === 'results' || abilitiesView === 'habits'))) ? 'w-full' : 'max-w-6xl mx-auto px-4 py-6 md:py-8'}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -709,11 +709,8 @@ export default function App() {
                 }}
               />
             )}
-            {activeTab === 'habits' && (
-              <HabitsPage 
-                onViewChange={setHabitsView}
-                onActivityComplete={handleActivityComplete}
-              />
+            {activeTab === 'routine' && (
+              <RoutinePage onActivityComplete={handleActivityComplete} />
             )}
             {activeTab === 'abilities' && (
               <AbilitiesPage 

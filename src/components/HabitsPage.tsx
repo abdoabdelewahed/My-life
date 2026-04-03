@@ -1,4 +1,3 @@
-import { ImprovementPhase } from './ImprovementPhase';
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as Lucide from 'lucide-react';
@@ -427,14 +426,9 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
     localStorage.setItem('habits_test_type', testType);
   }, [testType]);
   
-  const [isImproving, setIsImproving] = useState(() => localStorage.getItem('habits_is_improving') === 'true');
   const [hideResults, setHideResults] = useState(() => localStorage.getItem('habits_hide_results') === 'true');
   const [isTransitioning, setIsTransitioning] = useState(false);
   
-  useEffect(() => {
-    localStorage.setItem('habits_is_improving', isImproving.toString());
-  }, [isImproving]);
-
   useEffect(() => {
     localStorage.setItem('habits_hide_results', hideResults.toString());
   }, [hideResults]);
@@ -777,6 +771,18 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
           <div className="absolute inset-0 bg-atmospheric opacity-60" />
         </div>
 
+        {onBack && (
+          <div className="absolute top-4 right-4 z-20">
+            <Button
+              onClick={onBack}
+              variant="ghost"
+              className="w-10 h-10 p-0 flex items-center justify-center bg-white/10 hover:bg-white/20 text-gray-900 dark:text-white rounded-full backdrop-blur-md"
+            >
+              <ArrowRight size={20} />
+            </Button>
+          </div>
+        )}
+
         <div className="max-w-4xl w-full text-center space-y-8 md:space-y-12 relative z-10 py-8">
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
             <h2 className="text-3xl md:text-6xl font-black text-gray-900 dark:text-white mb-4">اختر نوع اختبار العادات</h2>
@@ -850,6 +856,15 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
           {currentStep > 0 ? (
             <Button 
               onClick={handlePrevious} 
+              variant="ghost"
+              size="sm"
+              className="p-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-all hover:scale-110 active:scale-90 group h-auto"
+            >
+              <ArrowRight size={28} className="text-gray-400 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white" />
+            </Button>
+          ) : onBack ? (
+            <Button 
+              onClick={onBack} 
               variant="ghost"
               size="sm"
               className="p-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-all hover:scale-110 active:scale-90 group h-auto"
@@ -1132,21 +1147,19 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
             <div className="absolute top-0 right-0 w-1/2 h-full bg-rose-500/5 blur-[120px]" />
           </div>
 
-          <div className="flex-1 overflow-y-auto pt-0 pb-24 md:pb-32">
-            {/* Improvement Phase Section - Full Width */}
-            <AnimatePresence>
-              {isImproving && (
-                <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="mb-8 relative z-20 w-full overflow-visible"
-                >
-                  <ImprovementPhase onActivityComplete={onActivityComplete} />
-                </motion.div>
-              )}
-            </AnimatePresence>
+          {onBack && (
+            <div className="absolute top-4 right-4 z-20">
+              <Button
+                onClick={onBack}
+                variant="ghost"
+                className="w-10 h-10 p-0 flex items-center justify-center bg-white/10 hover:bg-white/20 text-gray-900 dark:text-white rounded-full backdrop-blur-md"
+              >
+                <ArrowRight size={20} />
+              </Button>
+            </div>
+          )}
 
+          <div className="flex-1 overflow-y-auto pt-0 pb-24 md:pb-32">
             <div className="p-0 flex flex-col w-full">
               
               <AnimatePresence>
@@ -1261,19 +1274,6 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
                             ? "أداء جيد جداً! أنت على الطريق الصحيح، استمر في تعزيز عاداتك الإيجابية وتجاوز الهفوات البسيطة."
                             : "أداء مذهل! أنت تعيش بوعي عالٍ وتوازن رائع. حافظ على هذا المستوى واستمر في الارتقاء."}
                         </p>
-
-                        {!isImproving && (
-                          <Button
-                            onClick={() => {
-                              setIsImproving(true);
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }}
-                            className="bg-white text-black hover:bg-white/90 font-black px-8 py-6 h-auto rounded-2xl flex items-center gap-3 mx-auto shadow-xl shadow-white/10"
-                          >
-                            <Rocket size={20} />
-                            ابدأ التطوير
-                          </Button>
-                        )}
                       </div>
                     </motion.div>
                   </motion.div>

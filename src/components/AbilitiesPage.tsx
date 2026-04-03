@@ -17,8 +17,9 @@ import { LessonFlow } from './LessonFlow';
 import { PATH_COLORS } from '../constants';
 import { generateLessonContent } from '../utils/lessonUtils';
 import { getOrGenerateAudio } from '../services/audioCache';
+import { HabitsPage } from './HabitsPage';
 
-type ViewState = 'dashboard' | 'library' | 'assessment' | 'results' | 'improvement' | 'all_results';
+type ViewState = 'dashboard' | 'library' | 'assessment' | 'results' | 'improvement' | 'all_results' | 'habits';
 
 import { ASSESSMENTS, Assessment, Question, SubCategoryDef } from '../data/abilitiesData';
 
@@ -833,14 +834,100 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
                   <Target className="w-4 h-4" />
                 </Button>
               </div>
+            </div>
+          </motion.div>
+        )}
 
-              <div className="space-y-8">
-                {abilitiesAssessments.map((assessment, idx) => {
+        <div className="space-y-8">
+          {/* Habits Assessment Card */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-3">
+                <h4 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3">
+                  <Activity className={`w-6 h-6 md:w-8 md:h-8 ${localStorage.getItem('habits_test_finished') === 'true' ? 'text-indigo-500' : 'text-gray-400 dark:text-gray-500'}`} />
+                  عاداتي
+                </h4>
+              </div>
+              {localStorage.getItem('habits_test_finished') === 'true' && (
+                <div className="flex gap-2">
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      playPop();
+                      localStorage.setItem('habits_test_finished', 'false');
+                      setView('habits');
+                    }}
+                    className="w-8 h-8 md:w-10 md:h-10 p-0 flex items-center justify-center bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-900 dark:text-white rounded-full border border-gray-200 dark:border-white/10 transition-all hover:scale-105"
+                    title="إعادة الاختبار"
+                  >
+                    <Lucide.RotateCcw className="w-4 h-4 md:w-5 md:h-5" />
+                  </Button>
+                </div>
+              )}
+            </div>
+            
+            {localStorage.getItem('habits_test_finished') === 'true' ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={() => {
+                  playPop();
+                  setView('habits');
+                }}
+                className={`relative group cursor-pointer bg-white dark:bg-[#181818] p-6 md:p-8 rounded-3xl border-2 border-b-4 border-indigo-500/30 dark:border-indigo-500/20 transition-all hover:-translate-y-1 active:translate-y-0 active:border-b-2`}
+              >
+                <div className={`absolute inset-0 bg-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl`} />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className={`text-xl md:text-2xl font-black text-indigo-600 dark:text-indigo-400 mb-2`}>اختبار العادات</h3>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-bold">
+                      مكتمل - اضغط لعرض النتيجة
+                    </p>
+                  </div>
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center bg-indigo-500/10 text-indigo-500`}>
+                    <Activity className="w-8 h-8" />
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                onClick={() => {
+                  playPop();
+                  setView('habits');
+                }}
+                className="relative group cursor-pointer"
+              >
+                <div className="absolute inset-0 bg-indigo-500/20 blur-xl rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative bg-white dark:bg-[#181818] border-2 border-b-4 border-gray-200 dark:border-white/10 rounded-3xl p-6 md:p-8 overflow-hidden hover:border-indigo-500/50 dark:hover:border-indigo-500/50 transition-colors active:border-b-2 active:translate-y-[2px]">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div className="flex-1">
+                      <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white mb-2">اختبار العادات</h3>
+                      <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base leading-relaxed">اكتشف عاداتك الإيجابية والسلبية وكيف تؤثر على حياتك.</p>
+                    </div>
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        playPop();
+                        setView('habits');
+                      }}
+                      className="w-full md:w-auto h-12 px-8 rounded-2xl font-black text-sm bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
+                    >
+                      ابدأ الاختبار
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </div>
+
+          {abilitiesAssessments.map((assessment, idx) => {
                   const result = results[assessment.id];
                   const isCompleted = result != null;
                   const score = result?.overallScore;
                   const colors = getCardColors(score, assessment.type);
-                  const assessmentAbilities = allAbilities.filter(a => a.assessmentId === assessment.id);
                   
                   return (
                     <div key={assessment.id} className="space-y-4">
@@ -871,74 +958,34 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
                       </div>
 
                       {isCompleted ? (
-                        <div className="flex overflow-x-auto pb-4 pt-2 px-2 gap-4 snap-x hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                          {assessmentAbilities.map(ability => {
-                            const abilityResult = results[ability.assessmentId];
-                            const rawScore = abilityResult?.subCategories.find(s => s.id === ability.id)?.score;
-                            const abilityScore = (rawScore === undefined || Number.isNaN(rawScore)) ? null : rawScore;
-                            const abilityColors = getCardColors(abilityScore, ability.type);
-                            
-                            return (
-                              <motion.div 
-                                key={ability.id} 
-                                whileHover={{ y: -2 }}
-                                whileTap={{ y: 2 }}
-                                onClick={() => {
-                                  playPop();
-                                  if (ROADMAP_DATA[ability.id]) {
-                                    setSelectedRoadmapId(ability.id);
-                                  } else {
-                                    // Open standalone result
-                                    const abilityResult = results[ability.assessmentId];
-                                    const index = abilityResult?.subCategories.findIndex(s => s.id === ability.id);
-                                    if (index != null && index !== -1) {
-                                      setActiveAssessment(assessment);
-                                      setResultStep(index);
-                                      setIsStandaloneResult(true);
-                                      setSelectedSubCategoryId(ability.id);
-                                      setView('results');
-                                    }
-                                  }
-                                }}
-                                className={`snap-start shrink-0 w-40 md:w-48 bg-white dark:bg-[#181818] p-4 rounded-2xl border-2 border-b-4 ${abilityColors.border} flex flex-col gap-3 transition-all group cursor-pointer relative overflow-hidden active:border-b-2 shadow-sm`}
-                              >
-                                <div className={`absolute top-0 right-0 w-16 h-16 bg-${ability.color}-500/10 rounded-full blur-xl -z-10`} />
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${abilityColors.iconBg} ${abilityColors.iconText}`}>
-                                  {(() => {
-                                    const IconComponent = (Lucide as any)[ability.iconName] || Brain;
-                                    return <IconComponent className="w-6 h-6" />;
-                                  })()}
-                                </div>
-                                <div>
-                                  <h5 className="text-sm font-bold text-gray-900 dark:text-white mb-1 line-clamp-1">{ability.name}</h5>
-                                  {abilityScore == null && (
-                                    <div className="flex items-center justify-center mt-2">
-                                      <span className={`text-xs font-black ${abilityColors.iconText}`}>
-                                        غير مختبر
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                                {abilityScore != null && (
-                                  <div className="mt-auto">
-                                    <div className={`h-4 w-full ${abilityColors.progressBg} rounded-full overflow-hidden relative border border-gray-100 dark:border-white/5`}>
-                                      <motion.div 
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${abilityScore}%` }}
-                                        className={`h-full rounded-full ${abilityColors.progressFill} shadow-[inset_0_1px_2px_rgba(255,255,255,0.2)]`}
-                                      />
-                                      <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-[9px] font-black text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
-                                          {abilityScore}%
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                )}
-                              </motion.div>
-                            );
-                          })}
-                        </div>
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          onClick={() => {
+                            playPop();
+                            setActiveAssessment(assessment);
+                            setResultStep(0);
+                            setIsStandaloneResult(false);
+                            setView('results');
+                          }}
+                          className={`relative group cursor-pointer bg-white dark:bg-[#181818] p-6 md:p-8 rounded-3xl border-2 border-b-4 ${colors.border} transition-all hover:-translate-y-1 active:translate-y-0 active:border-b-2`}
+                        >
+                          <div className={`absolute inset-0 bg-${assessment.color}-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl`} />
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className={`text-xl md:text-2xl font-black ${colors.iconText} mb-2`}>{assessment.title}</h3>
+                              <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-bold">
+                                {score}% - {getLevel(score || 0, assessment.type).label}
+                              </p>
+                            </div>
+                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${colors.iconBg} ${colors.iconText}`}>
+                              {(() => {
+                                const IconComponent = (Lucide as any)[assessment.iconName] || Brain;
+                                return <IconComponent className="w-8 h-8" />;
+                              })()}
+                            </div>
+                          </div>
+                        </motion.div>
                       ) : (
                         <motion.div
                           initial={{ opacity: 0, y: 30 }}
@@ -975,7 +1022,6 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
                   const isCompleted = result != null;
                   const score = result?.overallScore;
                   const colors = getCardColors(score, assessment.type);
-                  const assessmentAbilities = allAbilities.filter(a => a.assessmentId === assessment.id);
                   
                   return (
                     <div key={assessment.id} className="space-y-4">
@@ -1006,74 +1052,34 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
                       </div>
 
                       {isCompleted ? (
-                        <div className="flex overflow-x-auto pb-4 pt-2 px-2 gap-4 snap-x hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                          {assessmentAbilities.map(ability => {
-                            const abilityResult = results[ability.assessmentId];
-                            const rawScore = abilityResult?.subCategories.find(s => s.id === ability.id)?.score;
-                            const abilityScore = (rawScore === undefined || Number.isNaN(rawScore)) ? null : rawScore;
-                            const abilityColors = getCardColors(abilityScore, ability.type);
-                            
-                            return (
-                              <motion.div 
-                                key={ability.id} 
-                                whileHover={{ y: -2 }}
-                                whileTap={{ y: 2 }}
-                                onClick={() => {
-                                  playPop();
-                                  if (ROADMAP_DATA[ability.id]) {
-                                    setSelectedRoadmapId(ability.id);
-                                  } else {
-                                    // Open standalone result
-                                    const abilityResult = results[ability.assessmentId];
-                                    const index = abilityResult?.subCategories.findIndex(s => s.id === ability.id);
-                                    if (index != null && index !== -1) {
-                                      setActiveAssessment(assessment);
-                                      setResultStep(index);
-                                      setIsStandaloneResult(true);
-                                      setSelectedSubCategoryId(ability.id);
-                                      setView('results');
-                                    }
-                                  }
-                                }}
-                                className={`snap-start shrink-0 w-40 md:w-48 bg-white dark:bg-[#181818] p-4 rounded-2xl border-2 border-b-4 ${abilityColors.border} flex flex-col gap-3 transition-all group cursor-pointer relative overflow-hidden active:border-b-2 shadow-sm`}
-                              >
-                                <div className={`absolute top-0 right-0 w-16 h-16 bg-${ability.color}-500/10 rounded-full blur-xl -z-10`} />
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${abilityColors.iconBg} ${abilityColors.iconText}`}>
-                                  {(() => {
-                                    const IconComponent = (Lucide as any)[ability.iconName] || Brain;
-                                    return <IconComponent className="w-6 h-6" />;
-                                  })()}
-                                </div>
-                                <div>
-                                  <h5 className="text-sm font-bold text-gray-900 dark:text-white mb-1 line-clamp-1">{ability.name}</h5>
-                                  {abilityScore == null && (
-                                    <div className="flex items-center justify-center mt-2">
-                                      <span className={`text-xs font-black ${abilityColors.iconText}`}>
-                                        غير مختبر
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                                {abilityScore != null && (
-                                  <div className="mt-auto">
-                                    <div className={`h-4 w-full ${abilityColors.progressBg} rounded-full overflow-hidden relative border border-gray-100 dark:border-white/5`}>
-                                      <motion.div 
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${abilityScore}%` }}
-                                        className={`h-full rounded-full ${abilityColors.progressFill} shadow-[inset_0_1px_2px_rgba(255,255,255,0.2)]`}
-                                      />
-                                      <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-[9px] font-black text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
-                                          {abilityScore}%
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                )}
-                              </motion.div>
-                            );
-                          })}
-                        </div>
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          onClick={() => {
+                            playPop();
+                            setActiveAssessment(assessment);
+                            setResultStep(0);
+                            setIsStandaloneResult(false);
+                            setView('results');
+                          }}
+                          className={`relative group cursor-pointer bg-white dark:bg-[#181818] p-6 md:p-8 rounded-3xl border-2 border-b-4 ${colors.border} transition-all hover:-translate-y-1 active:translate-y-0 active:border-b-2`}
+                        >
+                          <div className={`absolute inset-0 bg-${assessment.color}-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl`} />
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className={`text-xl md:text-2xl font-black ${colors.iconText} mb-2`}>{assessment.title}</h3>
+                              <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-bold">
+                                {score}% - {getLevel(score || 0, assessment.type).label}
+                              </p>
+                            </div>
+                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${colors.iconBg} ${colors.iconText}`}>
+                              {(() => {
+                                const IconComponent = (Lucide as any)[assessment.iconName] || Brain;
+                                return <IconComponent className="w-8 h-8" />;
+                              })()}
+                            </div>
+                          </div>
+                        </motion.div>
                       ) : (
                         <motion.div
                           initial={{ opacity: 0, y: 30 }}
@@ -1103,9 +1109,6 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
                   );
                 })}
               </div>
-            </div>
-          </motion.div>
-        )}
       </motion.div>
     );
   };
@@ -1319,6 +1322,18 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
       setSelectedRoadmapId(null);
     }
   };
+
+  if (view === 'habits') {
+    return (
+      <HabitsPage
+        onViewChange={() => {}}
+        onBack={() => setView('dashboard')}
+        onComplete={() => {}}
+        initialView="test_selection"
+        onActivityComplete={() => {}}
+      />
+    );
+  }
 
   return (
     <div className="pb-24 pt-4 md:pt-8 px-2 md:px-4">
