@@ -102,6 +102,7 @@ export const LessonFlow: React.FC<LessonFlowProps> = ({ step, onClose, onComplet
   };
 
   const handleClose = () => {
+    playPop();
     onClose();
   };
 

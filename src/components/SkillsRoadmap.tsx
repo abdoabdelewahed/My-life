@@ -270,19 +270,19 @@ export const SkillsRoadmap: React.FC<SkillIndicatorsProps> = ({
                     const completed = isItemCompleted(phaseIdx, itemIdx);
                     return (
                       <div key={itemIdx} className="flex items-start gap-2 md:gap-3">
-                        <div className={`mt-0.5 md:mt-1 w-4 h-4 md:w-5 md:h-5 rounded-full flex items-center justify-center shrink-0 border ${
-                          completed ? `bg-[#1DB954] border-[#1DB954] text-black` : 
-                          'border-white/20 text-transparent'
-                        }`}>
-                          <CheckCircle2 size={10} className={`md:w-3 md:h-3 ${completed ? 'opacity-100' : 'opacity-0'}`} />
-                        </div>
-                        <span className={`text-xs md:text-sm font-medium leading-relaxed ${
+                        <span className={`text-xs md:text-sm font-medium leading-relaxed flex-1 ${
                           completed ? 'text-gray-300' : 
                           isLocked ? 'text-gray-600' : 
                           'text-gray-400'
                         }`}>
                           {item}
                         </span>
+                        <div className={`mt-0.5 md:mt-1 w-4 h-4 md:w-5 md:h-5 rounded-full flex items-center justify-center shrink-0 border ${
+                          completed ? `bg-[#1DB954] border-[#1DB954] text-black` : 
+                          'border-white/20 text-transparent'
+                        }`}>
+                          <CheckCircle2 size={10} className={`md:w-3 md:h-3 ${completed ? 'opacity-100' : 'opacity-0'}`} />
+                        </div>
                       </div>
                     );
                   })}

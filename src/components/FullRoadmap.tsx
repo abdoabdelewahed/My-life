@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle2, Lock, Play, Target, ChevronDown, ChevronUp, BookOpen, Trophy, Rocket, Compass, X } from 'lucide-react';
+import { CheckCircle2, Check, Lock, Play, Target, ChevronDown, ChevronUp, BookOpen, Trophy, Rocket, Compass, X } from 'lucide-react';
 import { LEARNING_PATHS, PATH_COLORS } from '../constants';
 import { Button } from './ui/Button';
 
@@ -343,14 +343,15 @@ export function FullRoadmap({
               >
                 <div className="flex items-center justify-between gap-3 md:gap-4 relative z-10">
                   <div className="flex items-center gap-3 md:gap-5">
+                    {/* Icon Container (Moved to right) */}
                     <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 ${
-                      isUnitCompleted ? `${selectedPathColor?.bg} text-black` : 
+                      isUnitCompleted ? 'bg-green-500 text-white' : 
                       isUnitCurrent ? `bg-white text-black shadow-lg shadow-white/10` : 
                       'bg-white/5 text-gray-600'
                     }`}>
-                      {isUnitCompleted ? <CheckCircle2 size={24} className="md:w-7 md:h-7" /> : 
+                      {isUnitCompleted ? <Check size={24} className="md:w-7 md:h-7" /> : 
                        isUnitLocked ? <Lock size={20} className="md:w-6 md:h-6" /> : 
-                       <BookOpen size={24} className="md:w-7 md:h-7" />}
+                       <Check size={24} className="md:w-7 md:h-7" />}
                     </div>
                     <div>
                       <h4 className="font-black text-base md:text-xl text-white">{cleanTitle(unit.title)}</h4>
@@ -399,15 +400,6 @@ export function FullRoadmap({
                                 }`} />
                                 <div className="flex items-center justify-between gap-3 md:gap-4">
                                   <div className="flex items-center gap-3 md:gap-4">
-                                    <div className={`w-9 h-9 md:w-11 md:h-11 rounded-lg md:rounded-xl flex items-center justify-center shrink-0 ${
-                                      isCompleted ? `${selectedPathColor?.bg} text-black` : 
-                                      isCurrent ? 'bg-white text-black' : 
-                                      'bg-white/5 text-gray-700'
-                                    }`}>
-                                      {isCompleted ? <CheckCircle2 size={18} className="md:w-5 md:h-5" /> : 
-                                       isLocked ? <Lock size={14} className="md:w-4 md:h-4" /> : 
-                                       <Play size={14} fill="currentColor" className="md:w-4 md:h-4" />}
-                                    </div>
                                     <div>
                                       <h5 className={`font-bold text-sm md:text-base ${isCurrent ? 'text-white' : isLocked ? 'text-gray-600' : 'text-gray-300'}`}>
                                         {step.title}

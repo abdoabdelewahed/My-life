@@ -190,8 +190,7 @@ export const LearningPath: React.FC<LearningPathProps> = ({
                   isCompleted ? `${color.lightBg} ${color.text} border-gray-200 dark:border-white/10` : 
                   'bg-gray-200 dark:bg-white/5 text-gray-400 dark:text-white/20 border-gray-200 dark:border-white/5'
                 }`}>
-                  {isCompleted ? <Check size={24} className="md:w-7 md:h-7" /> :
-                   getIcon(step.icon, 24)}
+                  {getIcon(step.icon, 24)}
                 </div>
 
                 {/* Content */}

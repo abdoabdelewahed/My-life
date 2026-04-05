@@ -18,7 +18,7 @@ interface AssessmentFlowProps {
 const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ assessment, onClose, onComplete }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [stage, setStage] = useState<'assessment' | 'celebration'>('assessment');
+  const [stage, setStage] = useState<'intro' | 'assessment' | 'celebration'>('intro');
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const questions = Array.isArray(assessment?.questions) ? assessment.questions : [];
@@ -73,26 +73,131 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ assessment, onClose, on
         <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-b from-${assessment.color}-500/10 to-transparent opacity-30`} />
       </div>
 
+      {stage === 'intro' && (
+        <div className="relative z-10 w-full h-full flex flex-col">
+          <div className="flex-1 overflow-y-auto p-4 md:p-10">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-2xl w-full mx-auto text-center"
+            >
+              <div className="w-24 h-24 mx-auto rounded-3xl flex items-center justify-center bg-indigo-500/10 text-indigo-500 mb-8">
+                {(() => {
+                  const IconComponent = (Lucide as any)[assessment.iconName] || Brain;
+                  return <IconComponent className="w-12 h-12" />;
+                })()}
+              </div>
+              
+              <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6 leading-tight">
+                {assessment.title}
+              </h2>
+              
+              <p className="text-gray-500 dark:text-gray-400 text-base leading-relaxed mb-8">
+                {assessment.description || `اكتشف قدراتك في ${assessment.title} وتعرف على نقاط قوتك ومجالات التحسين.`}
+              </p>
+
+              <div className="mb-6 text-right">
+                <h3 className="text-lg font-black text-white mb-4">ماذا يختبر هذا التقييم؟</h3>
+                <p className="text-gray-400 text-sm mb-4 leading-relaxed">
+                  هذا الاختبار مصمم لقياس مجموعة محددة من القدرات والسمات الشخصية التي تؤثر بشكل مباشر على جودة حياتك وأدائك، وهي:
+                </p>
+                <div className="space-y-4">
+                  {assessment.subCategoriesDef?.map((cat: any, i: number) => (
+                    <div key={i} className="bg-white/5 dark:bg-white/5 border border-white/10 rounded-2xl p-5 flex gap-4">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-black text-sm">
+                        {i + 1}
+                      </div>
+                      <div className="flex-1">
+                        <h5 className="font-bold text-white text-sm mb-1">{cat.name}</h5>
+                        <p className="text-gray-400 text-xs leading-relaxed">{cat.description}</p>
+                      </div>
+                    </div>
+                  )) || (
+                    <p className="text-gray-400 text-sm">يختبر هذا التقييم مجموعة متنوعة من المهارات الأساسية المتعلقة بـ {assessment.title}.</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="bg-white/5 dark:bg-white/5 border border-white/10 rounded-2xl p-6 mb-6 text-right">
+                <h3 className="text-lg font-black text-white mb-4">مميزات الاختبار</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { icon: Lucide.Target, title: "تحليل دقيق", desc: "نتائج مبنية على إجاباتك الشخصية." },
+                    { icon: Lucide.Zap, title: "تطوير مستمر", desc: "خطوات عملية لتحسين أدائك." },
+                    { icon: Lucide.BarChart2, title: "قياس التقدم", desc: "تابع تطورك عبر الوقت." },
+                    { icon: Lucide.Shield, title: "خصوصية تامة", desc: "بياناتك محمية ومخصصة لك فقط." }
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className={`p-2 rounded-xl bg-indigo-500/20 text-indigo-400`}>
+                        <item.icon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h5 className="font-bold text-gray-900 dark:text-white text-sm">{item.title}</h5>
+                        <p className="text-gray-500 dark:text-gray-400 text-xs">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-6 mb-8 text-right">
+                <h4 className="text-indigo-400 font-bold mb-2 flex items-center gap-2">
+                  <Lucide.Info className="w-5 h-5" />
+                  نصيحة للحصول على أفضل نتيجة
+                </h4>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  يرجى الإجابة بصدق وشفافية على جميع الأسئلة. إجاباتك الصادقة هي المفتاح للحصول على تحليل دقيق ومخصص يساعدك فعلياً في رحلة تطويرك.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="p-6 md:p-10 border-t border-white/10 bg-[#0a0a0a] z-20">
+            <div className="max-w-2xl mx-auto flex gap-4">
+              <Button
+                onClick={() => {
+                  playPop();
+                  onClose();
+                }}
+                variant="ghost"
+                className="flex-1 h-12 rounded-2xl font-black text-sm bg-white/5 hover:bg-white/10 text-gray-900 dark:text-white border border-white/10 transition-all"
+              >
+                تراجع
+              </Button>
+              <Button
+                onClick={() => {
+                  playPop();
+                  setStage('assessment');
+                }}
+                className="flex-1 h-12 rounded-2xl font-black text-sm bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 transition-all"
+              >
+                ابدأ الاختبار
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       {stage === 'assessment' && (
         <div className="relative z-10 flex items-center gap-6 p-6 md:p-10">
           {/* Navigation */}
           <div className="flex items-center gap-4">
-            {currentQuestionIndex > 0 ? (
-              <Button 
-                onClick={() => {
-                  playPop();
+            <Button 
+              onClick={() => {
+                playPop();
+                if (currentQuestionIndex > 0) {
                   setCurrentQuestionIndex(prev => prev - 1);
-                }} 
-                variant="ghost"
-                size="sm"
-                className="p-3 hover:bg-white/5 rounded-2xl transition-all hover:scale-110 active:scale-90 group h-auto"
-              >
-                <ArrowRight size={28} className="text-gray-500 group-hover:text-white" />
-              </Button>
-            ) : (
-              <div className="w-[52px]" /> // Spacer to maintain layout
-            )}
+                } else {
+                  setStage('intro');
+                }
+              }} 
+              variant="ghost"
+              size="sm"
+              className="p-3 hover:bg-white/5 rounded-2xl transition-all hover:scale-110 active:scale-90 group h-auto"
+            >
+              <ArrowRight size={28} className="text-gray-500 group-hover:text-white" />
+            </Button>
           </div>
           
           <div className="flex-1 flex flex-col gap-3">
@@ -116,7 +221,10 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ assessment, onClose, on
 
           {/* Close Button */}
           <Button 
-            onClick={onClose} 
+            onClick={() => {
+              playPop();
+              onClose();
+            }} 
             variant="ghost"
             size="sm"
             className="p-3 hover:bg-white/5 rounded-2xl transition-all hover:scale-110 active:scale-90 group h-auto"
@@ -159,8 +267,8 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ assessment, onClose, on
                             : 'bg-[#181818] border-white/5 text-white hover:border-white/20 hover:bg-[#282828]'
                         }`}
                       >
-                        {isSelected && <CheckCircle2 size={24} className={`text-${assessment.color}-400`} />}
                         <span>{option.text}</span>
+                        {isSelected && <CheckCircle2 size={24} className={`text-${assessment.color}-400`} />}
                       </Button>
                     );
                   })}

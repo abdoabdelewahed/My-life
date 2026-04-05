@@ -89,17 +89,6 @@ export const DailyTasks = ({ tasks, onToggle }: Props) => {
               )}
             </AnimatePresence>
 
-            <motion.div 
-              initial={false}
-              animate={{ 
-                scale: task.completed ? [1, 1.3, 1] : 1,
-                rotate: task.completed ? [0, 15, 0] : 0
-              }}
-              transition={{ type: "spring", stiffness: 400, damping: 15 }}
-              className={task.completed ? 'text-[#1DB954]' : 'text-gray-300 group-hover:text-white transition-colors'}
-            >
-              {task.completed ? <CheckCircle2 size={24} className="md:w-8 md:h-8 fill-[#1DB954]/20" /> : <Circle size={24} className="md:w-8 md:h-8" />}
-            </motion.div>
             <div className="flex-1">
               <p className={`font-bold text-base md:text-lg mb-1.5 md:mb-2 transition-colors tracking-tight ${task.completed ? 'line-through text-[#8e8e93]' : 'text-white'}`}>
                 {task.title}
@@ -111,6 +100,17 @@ export const DailyTasks = ({ tasks, onToggle }: Props) => {
                 </span>
               </div>
             </div>
+            <motion.div 
+              initial={false}
+              animate={{ 
+                scale: task.completed ? [1, 1.3, 1] : 1,
+                rotate: task.completed ? [0, 15, 0] : 0
+              }}
+              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+              className={task.completed ? 'text-[#1DB954]' : 'text-gray-300 group-hover:text-white transition-colors'}
+            >
+              {task.completed ? <CheckCircle2 size={24} className="md:w-8 md:h-8 fill-[#1DB954]/20" /> : <Circle size={24} className="md:w-8 md:h-8" />}
+            </motion.div>
           </motion.div>
         ))}
       </motion.div>

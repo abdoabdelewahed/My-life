@@ -5,11 +5,12 @@ import { Button } from './ui/Button';
 const { Zap, FileBadge, Info, ChevronLeft, Sparkles, Trophy, Users, Volume2, VolumeX } = Lucide;
 
 interface MenuPageProps {
-  onNavigate: (tab: 'tools' | 'certificates' | 'about' | 'tasks' | 'settings' | 'store') => void;
+  onNavigate: (tab: 'tools' | 'certificates' | 'about' | 'tasks' | 'settings' | 'store' | 'routine' | 'abilities') => void;
   completedCount: number;
   stats: any;
   isInstallable?: boolean;
   onInstall?: () => void;
+  visibleTabs?: string[];
 }
 
 const container = {
@@ -25,8 +26,35 @@ const item = {
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };
 
-export const MenuPage = ({ onNavigate, completedCount, stats, isInstallable, onInstall }: MenuPageProps) => {
+export const MenuPage = ({ onNavigate, completedCount, stats, isInstallable, onInstall, visibleTabs = [] }: MenuPageProps) => {
   const menuItems = [
+    {
+      id: 'tasks',
+      title: 'الرئيسية',
+      icon: <Lucide.Home size={24} className="text-blue-500" />,
+      color: 'from-blue-500/20 to-blue-500/5',
+      borderColor: 'border-blue-500/30',
+      textColor: 'text-blue-400',
+      isMain: true
+    },
+    {
+      id: 'routine',
+      title: 'روتيني',
+      icon: <Lucide.Activity size={24} className="text-purple-500" />,
+      color: 'from-purple-500/20 to-purple-500/5',
+      borderColor: 'border-purple-500/30',
+      textColor: 'text-purple-400',
+      isMain: true
+    },
+    {
+      id: 'abilities',
+      title: 'القدرات',
+      icon: <Lucide.Brain size={24} className="text-amber-500" />,
+      color: 'from-amber-500/20 to-amber-500/5',
+      borderColor: 'border-amber-500/30',
+      textColor: 'text-amber-400',
+      isMain: true
+    },
     {
       id: 'certificates',
       title: 'الشهادات',
@@ -60,7 +88,7 @@ export const MenuPage = ({ onNavigate, completedCount, stats, isInstallable, onI
       borderColor: 'border-blue-500/30',
       textColor: 'text-blue-400'
     }
-  ];
+  ].filter(item => !item.isMain || visibleTabs.includes(item.id));
 
   return (
     <div className="space-y-8">

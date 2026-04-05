@@ -52,7 +52,6 @@ import RoutinePage from './components/RoutinePage';
 import { StreakModal } from './components/StreakModal';
 import { PointsModal } from './components/PointsModal';
 import AbilitiesPage from './components/AbilitiesPage';
-import { playChildVoice } from './utils/voice';
 import { LEARNING_PATHS, USER_CHARACTERS, PATH_COLORS } from './constants';
 import { playPop, playLevelUp } from './utils/sounds';
 import confetti from 'canvas-confetti';
@@ -181,7 +180,14 @@ export default function App() {
   const [userName, setUserName] = useState(() => localStorage.getItem('userName') || '');
   const [visibleTabs, setVisibleTabs] = useState<string[]>(() => {
     const saved = localStorage.getItem('visibleTabs');
-    return saved ? JSON.parse(saved) : ['tasks', 'routine', 'abilities', 'menu'];
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (!parsed.includes('routine')) {
+        return [...parsed, 'routine'];
+      }
+      return parsed;
+    }
+    return ['tasks', 'routine', 'abilities', 'menu'];
   });
 
   useEffect(() => {
@@ -505,6 +511,7 @@ export default function App() {
                   <HabitsPage 
                     onComplete={() => setPostOnboardingStep('results')} 
                     initialView="test_selection"
+                    onActivityComplete={handleActivityComplete}
                   />
                 </motion.div>
               )}
@@ -519,6 +526,7 @@ export default function App() {
                   <HabitsPage 
                     onComplete={handleHabitsResultsComplete} 
                     initialView="results"
+                    onActivityComplete={handleActivityComplete}
                   />
                 </motion.div>
               )}
@@ -624,7 +632,7 @@ export default function App() {
                         playPop();
                       }}
                     >
-                      <Star className="text-yellow-500 w-3.5 h-3.5 md:w-4 md:h-4" fill="currentColor" />
+                      <Zap className="text-amber-500 w-3.5 h-3.5 md:w-4 md:h-4" fill="currentColor" />
                       <span className="font-black text-xs md:text-sm text-white">{xp}</span>
                     </div>
                   </div>
@@ -674,7 +682,7 @@ export default function App() {
                     playPop();
                   }}
                 >
-                  <Star className="text-yellow-500 w-4 h-4" fill="currentColor" />
+                  <Zap className="text-amber-500 w-4 h-4" fill="currentColor" />
                   <span className="font-black text-xs text-white">{xp}</span>
                 </div>
               </div>

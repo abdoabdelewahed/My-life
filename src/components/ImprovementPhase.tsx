@@ -4,15 +4,24 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ProgressPage } from './ProgressPage';
 import { 
   Utensils, Droplets, Footprints, Flame, Check, 
-  X, Trophy, Zap, Moon, BookOpen, ChevronDown, Circle, CheckCircle2,
+  X, Trophy, Zap, Moon, BookOpen, ChevronDown, ChevronLeft, ChevronRight, Circle, CheckCircle2,
   Wallet, TrendingUp, Target, Lightbulb, Heart, Smile, MonitorOff, MonitorPlay,
   Users, Phone, HeartHandshake, Shield, PenTool, Sun, Briefcase, Award,
-  Sparkles, Wind, MessageCircle
+  Sparkles, Wind, MessageCircle, Plus, Edit2, Save, Trash2,
+  Settings2, Volume2, VolumeX, Palette, User
 } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
+
+const AVAILABLE_ICONS = [
+  'Sun', 'Moon', 'Star', 'Zap', 'Heart', 'Smile', 'Briefcase', 'Coffee', 'Book', 'Music', 
+  'Activity', 'Anchor', 'Award', 'Bell', 'Camera', 'Cloud', 'Compass', 'Feather', 'Flag', 
+  'Gift', 'Key', 'Leaf', 'Map', 'Target', 'Umbrella', 'Watch', 'Sparkles', 'Wind', 'MessageCircle',
+  'Utensils', 'Droplets', 'Footprints', 'Users', 'Phone', 'HeartHandshake'
+];
 import { Button } from './ui/Button';
 import confetti from 'canvas-confetti';
 import { playPop, playLevelUp } from '../utils/sounds';
-import { playChildVoice } from '../utils/voice';
+import { playWomanVoice } from '../utils/voice';
 import { PrayerBenefitsPage } from './PrayerBenefitsPage';
 
 interface HabitTask {
@@ -25,7 +34,7 @@ interface HabitTask {
 interface HabitCategory {
   id: string;
   title: string;
-  icon: React.ElementType;
+  iconName: string;
   color: string;
   bg: string;
   target: number;
@@ -39,10 +48,97 @@ interface Routine {
   id: string;
   title: string;
   description: string;
+  iconName?: string;
   categories: HabitCategory[];
 }
 
+interface CharacterMessages {
+  mental_health: string[];
+  faith: string[];
+  productivity: string[];
+  default: string[];
+  celebration: {
+    generic: string;
+    completed: string;
+    partial: string;
+  };
+}
+
 const ROUTINES: Routine[] = [
+  {
+    id: 'morning_routine',
+    title: 'روتين صباحي',
+    description: 'عادات لبداية يوم مشرق ومليء بالطاقة',
+    iconName: 'Sun',
+    categories: [
+      {
+        id: 'morning_wakeup',
+        title: 'الاستيقاظ',
+        iconName: 'Sun',
+        color: 'text-amber-500',
+        bg: 'bg-amber-500/10',
+        target: 3,
+        current: 0,
+        unit: 'مهمة',
+        tasks: [
+          { id: 'mw1', title: 'ترتيب السرير', points: 1, completed: false },
+          { id: 'mw2', title: 'شرب كوب ماء', points: 1, completed: false },
+          { id: 'mw3', title: 'تأمل 5 دقائق', points: 1, completed: false },
+        ]
+      },
+      {
+        id: 'morning_activity',
+        title: 'النشاط',
+        iconName: 'Zap',
+        color: 'text-orange-500',
+        bg: 'bg-orange-500/10',
+        target: 2,
+        current: 0,
+        unit: 'مهمة',
+        tasks: [
+          { id: 'ma1', title: 'تمرين رياضي خفيف', points: 2, completed: false },
+          { id: 'ma2', title: 'قراءة صفحتين', points: 1, completed: false },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'evening_routine',
+    title: 'روتين مسائي',
+    description: 'عادات لختام اليوم باسترخاء واستعداد للغد',
+    iconName: 'Moon',
+    categories: [
+      {
+        id: 'evening_relax',
+        title: 'الاسترخاء',
+        iconName: 'Moon',
+        color: 'text-indigo-500',
+        bg: 'bg-indigo-500/10',
+        target: 3,
+        current: 0,
+        unit: 'مهمة',
+        tasks: [
+          { id: 'er1', title: 'إغلاق الشاشات', points: 1, completed: false },
+          { id: 'er2', title: 'قراءة كتاب', points: 2, completed: false },
+          { id: 'er3', title: 'كتابة يوميات', points: 1, completed: false },
+        ]
+      },
+      {
+        id: 'evening_prep',
+        title: 'الاستعداد للنوم',
+        iconName: 'Briefcase',
+        color: 'text-teal-500',
+        bg: 'bg-teal-500/10',
+        target: 2,
+        current: 0,
+        unit: 'مهمة',
+        tasks: [
+          { id: 'ep1', title: 'تجهيز ملابس الغد', points: 1, completed: false },
+          { id: 'ep2', title: 'العناية الشخصية', points: 1, completed: false },
+        ]
+      }
+    ]
+  },
   {
     id: 'mental_health',
     title: 'تعزيز صحتي النفسية',
@@ -51,7 +147,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'positive_thinking',
         title: 'التفكير الإيجابي وحب الذات',
-        icon: Sparkles,
+        iconName: 'Sparkles',
         color: 'text-yellow-500',
         bg: 'bg-yellow-500/10',
         target: 4,
@@ -67,7 +163,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'anxiety_management',
         title: 'إدارة القلق',
-        icon: Wind,
+        iconName: 'Wind',
         color: 'text-teal-500',
         bg: 'bg-teal-500/10',
         target: 2,
@@ -81,7 +177,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'emotional_expression',
         title: 'التعبير عن المشاعر',
-        icon: MessageCircle,
+        iconName: 'MessageCircle',
         color: 'text-rose-500',
         bg: 'bg-rose-500/10',
         target: 2,
@@ -102,7 +198,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'prayers',
         title: 'الصلوات',
-        icon: Moon,
+        iconName: 'Moon',
         color: 'text-indigo-500',
         bg: 'bg-indigo-500/10',
         target: 5,
@@ -119,7 +215,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'quran',
         title: 'القرآن',
-        icon: BookOpen,
+        iconName: 'BookOpen',
         color: 'text-teal-500',
         bg: 'bg-teal-500/10',
         target: 1,
@@ -132,7 +228,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'azkar',
         title: 'الأذكار',
-        icon: Zap,
+        iconName: 'Zap',
         color: 'text-yellow-500',
         bg: 'bg-yellow-500/10',
         target: 2,
@@ -153,7 +249,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'reading',
         title: 'القراءة',
-        icon: BookOpen,
+        iconName: 'BookOpen',
         color: 'text-blue-500',
         bg: 'bg-blue-500/10',
         target: 20,
@@ -166,7 +262,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'planning',
         title: 'التخطيط',
-        icon: Check,
+        iconName: 'Check',
         color: 'text-emerald-500',
         bg: 'bg-emerald-500/10',
         target: 1,
@@ -179,7 +275,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'focus',
         title: 'التركيز',
-        icon: Target,
+        iconName: 'Target',
         color: 'text-blue-500',
         bg: 'bg-blue-500/10',
         target: 2,
@@ -195,7 +291,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'achievements',
         title: 'الإنجازات',
-        icon: Award,
+        iconName: 'Award',
         color: 'text-amber-500',
         bg: 'bg-amber-500/10',
         target: 1,
@@ -215,7 +311,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'meals',
         title: 'التغذية',
-        icon: Utensils,
+        iconName: 'Utensils',
         color: 'text-orange-500',
         bg: 'bg-orange-500/10',
         target: 3,
@@ -230,7 +326,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'water',
         title: 'شرب الماء',
-        icon: Droplets,
+        iconName: 'Droplets',
         color: 'text-blue-500',
         bg: 'bg-blue-500/10',
         target: 8,
@@ -245,7 +341,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'steps',
         title: 'النشاط البدني',
-        icon: Footprints,
+        iconName: 'Footprints',
         color: 'text-emerald-500',
         bg: 'bg-emerald-500/10',
         target: 5000,
@@ -267,7 +363,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'family',
         title: 'صلة الرحم',
-        icon: Users,
+        iconName: 'Users',
         color: 'text-orange-500',
         bg: 'bg-orange-500/10',
         target: 1,
@@ -280,7 +376,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'friends',
         title: 'الأصدقاء',
-        icon: Phone,
+        iconName: 'Phone',
         color: 'text-blue-500',
         bg: 'bg-blue-500/10',
         target: 1,
@@ -293,7 +389,7 @@ const ROUTINES: Routine[] = [
       {
         id: 'volunteering',
         title: 'العطاء',
-        icon: HeartHandshake,
+        iconName: 'HeartHandshake',
         color: 'text-rose-500',
         bg: 'bg-rose-500/10',
         target: 1,
@@ -304,6 +400,30 @@ const ROUTINES: Routine[] = [
         ]
       }
     ]
+  },
+  {
+    id: 'financial_capability',
+    title: 'تعزيز القدرة المالية',
+    description: 'عادات لإدارة أموالك بذكاء، التوفير، والاستثمار في مستقبلك المالي',
+    iconName: 'Wallet',
+    categories: [
+      {
+        id: 'financial_habits',
+        title: 'الإدارة المالية الذكية',
+        iconName: 'Wallet',
+        color: 'text-emerald-500',
+        bg: 'bg-emerald-500/10',
+        target: 4,
+        current: 0,
+        unit: 'مهمة',
+        tasks: [
+          { id: 'fh1', title: 'تسجيل المصاريف اليومية', points: 1, completed: false },
+          { id: 'fh2', title: 'تخصيص مبلغ للادخار', points: 1, completed: false },
+          { id: 'fh3', title: 'مراجعة الميزانية الأسبوعية', points: 1, completed: false },
+          { id: 'fh4', title: 'قراءة مقال عن الاستثمار', points: 1, completed: false },
+        ]
+      }
+    ]
   }
 ];
 
@@ -311,95 +431,8 @@ interface ImprovementPhaseProps {
   onActivityComplete?: (xp: number) => void;
 }
 
-export const CharacterSVG = ({ isCelebrating, isSad }: { isCelebrating: boolean, isSad: boolean }) => {
-  const color = isSad ? "#64748b" : "#8b5cf6";
-  return (
-    <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-[0_0_50px_rgba(139,92,246,0.6)] overflow-visible">
-      <style>
-        {`
-          @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-          }
-          @keyframes spinAndTilt {
-            0%, 80%, 100% { transform: rotate(0deg); }
-            82% { transform: rotate(10deg); }
-            84% { transform: rotate(-10deg); }
-            86% { transform: rotate(0deg); }
-            95% { transform: rotate(360deg); }
-          }
-          @keyframes blink {
-            0%, 46%, 48%, 100% { transform: scaleY(1); }
-            47% { transform: scaleY(0); }
-          }
-          @keyframes look {
-            0%, 20%, 100% { transform: translate(0, 0); }
-            25%, 45% { transform: translate(-6px, 2px); }
-            50%, 70% { transform: translate(6px, -2px); }
-          }
-          @keyframes earWiggle {
-            0%, 70%, 100% { transform: rotate(0deg); }
-            75% { transform: rotate(20deg); }
-            80% { transform: rotate(-20deg); }
-            85% { transform: rotate(15deg); }
-          }
-          @keyframes laugh {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-          }
-          .char-wrapper { animation: spinAndTilt 15s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
-          .char-float { animation: float 3s ease-in-out infinite; }
-          .char-blink { animation: blink 4s infinite; transform-origin: center; transform-box: fill-box; }
-          .char-look { animation: look 8s infinite; }
-          .char-ear-l { animation: earWiggle 5s infinite; transform-origin: center; transform-box: fill-box; }
-          .char-ear-r { animation: earWiggle 5s infinite; animation-delay: 0.2s; transform-origin: center; transform-box: fill-box; }
-          .char-laugh { animation: laugh 0.6s infinite alternate; transform-origin: center; transform-box: fill-box; }
-        `}
-      </style>
-      <g className="char-float">
-        <g className="char-wrapper">
-          <circle cx="100" cy="110" r="70" fill={color} />
-          <circle cx="50" cy="60" r="22" fill={color} className="char-ear-l" />
-          <circle cx="150" cy="60" r="22" fill={color} className="char-ear-r" />
-          <circle cx="30" cy="120" r="18" fill={color} className="char-ear-l" style={{ animationDelay: '0.5s' }} />
-          <circle cx="170" cy="120" r="18" fill={color} className="char-ear-r" style={{ animationDelay: '0.7s' }} />
-          
-          {/* Eyes/Mouth */}
-          {isSad ? (
-            <>
-              <path d="M 65 90 Q 75 100 85 90" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" />
-              <path d="M 115 90 Q 125 100 135 90" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" />
-              <path d="M 80 140 Q 100 120 120 140" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" />
-            </>
-          ) : isCelebrating ? (
-            <>
-              {/* Happy closed eyes */}
-              <path d="M 65 100 Q 75 90 85 100" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" />
-              <path d="M 115 100 Q 125 90 135 100" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" />
-              {/* Big Laughing Mouth */}
-              <g className="char-laugh">
-                <path d="M 80 125 Q 100 150 120 125 Z" fill="white" />
-              </g>
-            </>
-          ) : (
-            <>
-              <g className="char-blink">
-                <circle cx="75" cy="100" r="14" fill="white" />
-                <circle cx="75" cy="100" r="6" fill="black" className="char-look" />
-              </g>
-              <g className="char-blink">
-                <circle cx="125" cy="100" r="14" fill="white" />
-                <circle cx="125" cy="100" r="6" fill="black" className="char-look" />
-              </g>
-              {/* Normal Smile */}
-              <path d="M 85 125 Q 100 135 115 125" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" />
-            </>
-          )}
-        </g>
-      </g>
-    </svg>
-  );
-};
+import { SarahChar, CharacterState } from './SarahChar';
+import { DuoChar } from './DuoChar';
 
 export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) => {
   const [routines, setRoutines] = useState<Routine[]>(() => {
@@ -418,7 +451,7 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
         }
 
         // Merge saved state with initial state to restore icons
-        return ROUTINES.map(initRoutine => {
+        const merged = ROUTINES.map(initRoutine => {
           const savedRoutine = parsed.find((r: any) => r.id === initRoutine.id);
           if (savedRoutine) {
             return {
@@ -428,11 +461,15 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                 if (savedCat) {
                   return {
                     ...initCat,
-                    current: shouldReset ? 0 : savedCat.current,
-                    rewardClaimed: shouldReset ? false : savedCat.rewardClaimed,
-                    tasks: initCat.tasks.map(initTask => {
-                      const savedTask = savedCat.tasks.find((t: any) => t.id === initTask.id);
-                      return savedTask ? { ...initTask, completed: shouldReset ? false : savedTask.completed } : initTask;
+                    current: shouldReset ? 0 : (Number(savedCat.current) || 0),
+                    target: Number(savedCat.target) || initCat.target || 0,
+                    rewardClaimed: shouldReset ? false : !!savedCat.rewardClaimed,
+                    tasks: (savedCat.tasks || []).map((t: any) => {
+                      const initTask = initCat.tasks.find((it: any) => it.id === t.id);
+                      return {
+                        ...t,
+                        title: t.title || (initTask ? initTask.title : 'مهمة بدون عنوان')
+                      };
                     })
                   };
                 }
@@ -442,6 +479,33 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
           }
           return initRoutine;
         });
+
+        // Add custom routines and ensure tasks have titles and valid numbers
+        const customRoutines = parsed.filter((r: any) => !ROUTINES.some(init => init.id === r.id)).map((r: any) => ({
+          ...r,
+          categories: r.categories.map((c: any) => ({
+            ...c,
+            current: Number(c.current) || 0,
+            target: Number(c.target) || (c.tasks ? c.tasks.length : 0),
+            tasks: (c.tasks || []).map((t: any) => ({
+              ...t,
+              title: t.title || 'مهمة بدون عنوان'
+            }))
+          }))
+        }));
+        
+        // Reset tasks in custom routines if needed
+        if (shouldReset) {
+          customRoutines.forEach((r: any) => {
+            r.categories.forEach((c: any) => {
+              c.current = 0;
+              c.rewardClaimed = false;
+              c.tasks.forEach((t: any) => t.completed = false);
+            });
+          });
+        }
+
+        return [...merged, ...customRoutines];
       } catch (e) {
         console.error('Failed to parse saved routines', e);
       }
@@ -457,6 +521,102 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProgressOpen, setIsProgressOpen] = useState(false);
+
+  const [isAddingRoutine, setIsAddingRoutine] = useState(false);
+  const [newRoutineTitle, setNewRoutineTitle] = useState('');
+  const [newRoutineDesc, setNewRoutineDesc] = useState('');
+  const [newRoutineIcon, setNewRoutineIcon] = useState('Star');
+  const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+
+  const [isTaskManagementOpen, setIsTaskManagementOpen] = useState(false);
+  const [isCustomizationOpen, setIsCustomizationOpen] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('soundEnabled') !== 'false');
+  const [selectedCharacter, setSelectedCharacter] = useState<'sarah' | 'duo'>(() => {
+    return (localStorage.getItem('selected_character') as 'sarah' | 'duo') || 'sarah';
+  });
+
+  const [characterMessages, setCharacterMessages] = useState<CharacterMessages>(() => {
+    const saved = localStorage.getItem('character_messages');
+    if (saved) return JSON.parse(saved);
+    return {
+      mental_health: [
+        "خذ نفساً عميقاً، أنت تستحق الهدوء.",
+        "تذكر أن تبتسم، صحتك النفسية تهمنا.",
+        "لا تنسَ أن تخصص وقتاً لنفسك اليوم.",
+        "كل خطوة صغيرة تصنع فرقاً كبيراً في يومك.",
+        "أنت أقوى مما تعتقد، استمر في العناية بنفسك."
+      ],
+      faith: [
+        "هل صليت الفروض اليوم؟ تقبل الله منك.",
+        "ألا بذكر الله تطمئن القلوب، اذكر الله.",
+        "نور قلبك بقراءة آيات من القرآن الكريم.",
+        "جدد نيتك واجعل يومك كله لله.",
+        "الدعاء يغير الأقدار، لا تنسَ الدعاء اليوم."
+      ],
+      productivity: [
+        "نظم وقتك، فالوقت هو أثمن ما تملك.",
+        "ركز على المهام الأهم أولاً، أنت قادر على الإنجاز!",
+        "قراءة بضع صفحات اليوم تبني عقلك للغد.",
+        "خطوة بخطوة نحو أهدافك، استمر في العمل الرائع.",
+        "العمل العميق يصنع النجاح، حافظ على تركيزك."
+      ],
+      default: [
+        "أنا فخورة بك جداً!",
+        "أنت تقوم بعمل رائع، استمر!",
+        "مستعد لتحدي جديد؟"
+      ],
+      celebration: {
+        generic: "أنت رائع! انا فخور بك",
+        completed: "أنت بطل! لقد أنجزت كل المهام بنجاح",
+        partial: "عمل رائع! استمر يا بطل"
+      }
+    };
+  });
+
+  const [isMessageCustomizationOpen, setIsMessageCustomizationOpen] = useState(false);
+
+  const updateMessage = (category: keyof Omit<CharacterMessages, 'celebration'>, index: number, newValue: string) => {
+    const newMessages = { ...characterMessages };
+    newMessages[category][index] = newValue;
+    setCharacterMessages(newMessages);
+  };
+
+  const addMessage = (category: keyof Omit<CharacterMessages, 'celebration'>) => {
+    const newMessages = { ...characterMessages };
+    newMessages[category].push("رسالة جديدة...");
+    setCharacterMessages(newMessages);
+  };
+
+  const removeMessage = (category: keyof Omit<CharacterMessages, 'celebration'>, index: number) => {
+    const newMessages = { ...characterMessages };
+    newMessages[category].splice(index, 1);
+    setCharacterMessages(newMessages);
+  };
+
+  const updateCelebrationMessage = (key: keyof CharacterMessages['celebration'], newValue: string) => {
+    setCharacterMessages({
+      ...characterMessages,
+      celebration: {
+        ...characterMessages.celebration,
+        [key]: newValue
+      }
+    });
+  };
+
+  useEffect(() => {
+    localStorage.setItem('character_messages', JSON.stringify(characterMessages));
+  }, [characterMessages]);
+
+  useEffect(() => {
+    localStorage.setItem('soundEnabled', soundEnabled.toString());
+  }, [soundEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem('selected_character', selectedCharacter);
+  }, [selectedCharacter]);
+
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editTaskTitle, setEditTaskTitle] = useState('');
 
   useEffect(() => {
     // Save to localStorage without the icon components
@@ -476,11 +636,124 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
     localStorage.setItem('improvement_selected_routine', selectedRoutineId);
   }, [selectedRoutineId]);
 
+  const handleAddRoutine = () => {
+    if (!newRoutineTitle.trim()) return;
+    const newRoutine: Routine = {
+      id: `routine_${Date.now()}`,
+      title: newRoutineTitle,
+      description: newRoutineDesc || 'روتين جديد',
+      iconName: newRoutineIcon,
+      categories: [
+        {
+          id: `cat_${Date.now()}`,
+          title: 'المهام',
+          iconName: newRoutineIcon,
+          color: 'text-purple-500',
+          bg: 'bg-purple-500/10',
+          target: 0,
+          current: 0,
+          unit: 'مهمة',
+          tasks: [],
+          rewardClaimed: false
+        }
+      ]
+    };
+    setRoutines([...routines, newRoutine]);
+    setIsAddingRoutine(false);
+    setNewRoutineTitle('');
+    setNewRoutineDesc('');
+    setNewRoutineIcon('Star');
+    setSelectedRoutineId(newRoutine.id);
+  };
+
+  const handleAddTask = (categoryId: string, title?: string) => {
+    const titleToUse = title || '';
+    if (!titleToUse.trim()) return;
+    const newTask: HabitTask = {
+      id: `task_${Date.now()}`,
+      title: titleToUse,
+      points: 1,
+      completed: false
+    };
+    setRoutines(prev => prev.map(routine => {
+      if (routine.id !== selectedRoutineId) return routine;
+      return {
+        ...routine,
+        categories: routine.categories.map(cat => {
+          if (cat.id !== categoryId) return cat;
+          return { ...cat, tasks: [...cat.tasks, newTask], target: cat.target + 1 };
+        })
+      };
+    }));
+    setSelectedCategory(prev => {
+      if (!prev || prev.id !== categoryId) return prev;
+      return { ...prev, tasks: [...prev.tasks, newTask], target: prev.target + 1 };
+    });
+  };
+
+  const handleEditTask = (categoryId: string, taskId: string) => {
+    if (!editTaskTitle.trim()) return;
+    setRoutines(prev => prev.map(routine => {
+      if (routine.id !== selectedRoutineId) return routine;
+      return {
+        ...routine,
+        categories: routine.categories.map(cat => {
+          if (cat.id !== categoryId) return cat;
+          return {
+            ...cat,
+            tasks: cat.tasks.map(t => t.id === taskId ? { ...t, title: editTaskTitle } : t)
+          };
+        })
+      };
+    }));
+    setSelectedCategory(prev => {
+      if (!prev || prev.id !== categoryId) return prev;
+      return {
+        ...prev,
+        tasks: prev.tasks.map(t => t.id === taskId ? { ...t, title: editTaskTitle } : t)
+      };
+    });
+    setEditingTaskId(null);
+    setEditTaskTitle('');
+  };
+
+  const handleDeleteTask = (categoryId: string, taskId: string) => {
+    setRoutines(prev => prev.map(routine => {
+      if (routine.id !== selectedRoutineId) return routine;
+      return {
+        ...routine,
+        categories: routine.categories.map(cat => {
+          if (cat.id !== categoryId) return cat;
+          const taskToDelete = cat.tasks.find(t => t.id === taskId);
+          const isCompleted = taskToDelete?.completed;
+          return {
+            ...cat,
+            tasks: cat.tasks.filter(t => t.id !== taskId),
+            target: Math.max(0, cat.target - 1),
+            current: isCompleted ? Math.max(0, cat.current - 1) : cat.current
+          };
+        })
+      };
+    }));
+    setSelectedCategory(prev => {
+      if (!prev || prev.id !== categoryId) return prev;
+      const taskToDelete = prev.tasks.find(t => t.id === taskId);
+      const isCompleted = taskToDelete?.completed;
+      return {
+        ...prev,
+        tasks: prev.tasks.filter(t => t.id !== taskId),
+        target: Math.max(0, prev.target - 1),
+        current: isCompleted ? Math.max(0, prev.current - 1) : prev.current
+      };
+    });
+  };
+
   const activeRoutine = routines.find(r => r.id === selectedRoutineId) || routines[0];
   const categories = activeRoutine.categories;
 
   const [selectedCategory, setSelectedCategory] = useState<HabitCategory | null>(null);
   const [showTasks, setShowTasks] = useState(false);
+  const [sessionHasCompletion, setSessionHasCompletion] = useState(false);
   const [isCelebrating, setIsCelebrating] = useState(false);
   const [isSad, setIsSad] = useState(false);
   const [celebrationMessage, setCelebrationMessage] = useState<string | null>(null);
@@ -519,33 +792,52 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
 
   // Idle messages logic
   useEffect(() => {
-    const messages = [
-      "ابدأ درس جديد يا بطل!",
-      "أنا فخور بك جداً!",
-      "يلا نتعلم حاجة جديدة اليوم!",
-      "أنت بتعمل مجهود رائع!",
-      "مستعد لتحدي جديد؟"
-    ];
+    let messages: string[] = [];
+    
+    if (selectedRoutineId === 'mental_health') {
+      messages = characterMessages.mental_health;
+    } else if (selectedRoutineId === 'faith') {
+      messages = characterMessages.faith;
+    } else if (selectedRoutineId === 'productivity') {
+      messages = characterMessages.productivity;
+    } else {
+      messages = characterMessages.default;
+    }
 
     const interval = setInterval(() => {
-      if (!isCelebrating && !showTasks) {
+      if (!isCelebrating && !showTasks && messages.length > 0) {
         const randomMsg = messages[Math.floor(Math.random() * messages.length)];
         setIdleMessage(randomMsg);
-        playChildVoice(randomMsg);
+        playWomanVoice(randomMsg);
         
         setTimeout(() => {
           setIdleMessage(null);
-        }, 4000);
+        }, 8000);
       }
-    }, 10000); // Every 10 seconds
+    }, 20000); // Every 20 seconds
 
     return () => clearInterval(interval);
-  }, [isCelebrating, showTasks]);
+  }, [isCelebrating, showTasks, selectedRoutineId, characterMessages]);
 
   const handleCloseTasks = (overrideDuration?: number) => {
     setShowTasks(false);
-    if (overrideDuration && overrideDuration > 0) {
-      const msg = "أنت رائع! انا فخور بك";
+    setEditingTaskId(null);
+    
+    const shouldCelebrate = overrideDuration || sessionHasCompletion;
+    const duration = overrideDuration || 3000;
+
+    if (shouldCelebrate) {
+      let msg = characterMessages.celebration.generic;
+      
+      if (selectedCategory) {
+        const isFullyCompleted = selectedCategory.current >= selectedCategory.target && selectedCategory.target > 0;
+        if (isFullyCompleted) {
+          msg = characterMessages.celebration.completed;
+        } else if (sessionHasCompletion) {
+          msg = characterMessages.celebration.partial;
+        }
+      }
+
       setCelebrationMessage(msg);
       setIsCelebrating(true);
       playLevelUp();
@@ -559,7 +851,7 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
       });
 
       // Speak the exact message
-      playChildVoice(msg);
+      playWomanVoice(msg);
 
       if (celebrationTimeoutRef.current) {
         clearTimeout(celebrationTimeoutRef.current);
@@ -569,8 +861,9 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
       celebrationTimeoutRef.current = setTimeout(() => {
         setIsCelebrating(false);
         setCelebrationMessage(null);
-      }, overrideDuration);
+      }, duration);
     }
+    setSessionHasCompletion(false);
   };
 
   const handleClaimReward = (categoryId: string) => {
@@ -674,10 +967,10 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
             return task;
           });
           
-          const newCurrent = newTasks.reduce((acc, t) => t.completed ? acc + t.points : acc, 0);
+          const newCurrent = newTasks.filter(t => t.completed).length;
           isFullyCompleted = newCurrent >= cat.target;
           
-          const newCat = { ...cat, tasks: newTasks, current: Math.min(newCurrent, cat.target) };
+          const newCat = { ...cat, tasks: newTasks, current: newCurrent };
           updatedCat = newCat;
           return newCat;
         }
@@ -692,20 +985,7 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
     if (justCompleted) {
       playPop();
       onActivityComplete?.(10); // Award 10 XP for completing a task
-      
-      const msg = isFullyCompleted ? "أنت بطل! لقد أنجزت كل المهام بنجاح" : "عمل رائع! استمر يا بطل";
-      setCelebrationMessage(msg);
-      setIsCelebrating(true);
-      playChildVoice(msg);
-      
-      if (celebrationTimeoutRef.current) {
-        clearTimeout(celebrationTimeoutRef.current);
-      }
-
-      celebrationTimeoutRef.current = setTimeout(() => {
-        setIsCelebrating(false);
-        setCelebrationMessage(null);
-      }, 3000);
+      setSessionHasCompletion(true);
     }
 
     if (updatedCat && selectedCategory?.id === categoryId) {
@@ -738,7 +1018,11 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
             className="flex flex-col items-center"
           >
             <div className="w-32 h-32 md:w-40 md:h-40 relative">
-                <CharacterSVG isCelebrating={isCelebrating || !!idleMessage} isSad={isSad && !isCelebrating && !idleMessage} />
+                {selectedCharacter === 'sarah' ? (
+                  <SarahChar state={isCelebrating || !!idleMessage ? 'celebrate' : (isSad ? 'sad' : 'idle')} />
+                ) : (
+                  <DuoChar state={isCelebrating || !!idleMessage ? 'celebrate' : (isSad ? 'sad' : 'idle')} />
+                )}
             </div>
           </motion.div>
 
@@ -761,6 +1045,13 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
           <p className="text-gray-500 dark:text-gray-400 text-xs md:text-base max-w-xl mx-auto leading-relaxed mb-6">أنا مدربك الشخصي، سأساعدك في بناء عاداتك الجديدة خطوة بخطوة</p>
           
           <div className="flex items-center justify-center gap-2">
+            <button 
+              onClick={() => setIsCustomizationOpen(true)}
+              className="inline-flex items-center gap-2 bg-white dark:bg-white/5 hover:bg-gray-50 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 px-4 py-3 rounded-full text-gray-600 dark:text-gray-300 transition-all"
+              title="تخصيص الشخصية والإعدادات"
+            >
+              <Settings2 size={18} />
+            </button>
             <button 
               onClick={() => setIsDropdownOpen(true)}
               className="inline-flex items-center gap-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 px-6 py-3 rounded-full text-gray-900 dark:text-white transition-all"
@@ -788,6 +1079,7 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
             onClick={() => {
               setSelectedCategory(cat);
               setShowTasks(true);
+              setSessionHasCompletion(false);
             }}
             className="flex flex-col items-center gap-3 md:gap-4 p-4 md:p-6 rounded-[2rem] md:rounded-[2.5rem] bg-white dark:bg-white/[0.03] border border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-all group relative overflow-hidden shadow-sm dark:shadow-none"
           >
@@ -811,7 +1103,10 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                 />
               </svg>
               <div className={`absolute inset-0 flex items-center justify-center ${cat.color}`}>
-                <cat.icon className="w-5 h-5 md:w-10 md:h-10" />
+                {(() => {
+                  const IconComponent = (LucideIcons as any)[cat.iconName] || Circle;
+                  return <IconComponent className="w-5 h-5 md:w-10 md:h-10" />;
+                })()}
               </div>
             </div>
             <div className="text-center overflow-hidden w-full relative z-10">
@@ -825,7 +1120,305 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
         ))}
       </div>
 
-      {/* Progress Page Overlay */}
+      {/* Customization & Settings Overlay */}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {isCustomizationOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 bg-white dark:bg-[#121212] z-[200] flex flex-col transition-colors duration-300"
+            >
+              <div className="p-6 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
+                <h3 className="text-2xl font-black text-gray-900 dark:text-white">تخصيص الشخصية</h3>
+                <button 
+                  onClick={() => setIsCustomizationOpen(false)}
+                  className="p-2 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                {/* Character Preview & Navigation */}
+                <div className="flex flex-col items-center py-6 bg-gray-50 dark:bg-white/5 rounded-3xl space-y-6">
+                  <div className="w-40 h-40 relative">
+                    {selectedCharacter === 'sarah' ? (
+                      <SarahChar state="happy" />
+                    ) : (
+                      <DuoChar state="happy" />
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-8">
+                    <button 
+                      onClick={() => setSelectedCharacter(selectedCharacter === 'sarah' ? 'duo' : 'sarah')}
+                      className="p-3 rounded-full bg-white dark:bg-white/10 shadow-sm hover:bg-gray-100 dark:hover:bg-white/20 transition-all border border-gray-100 dark:border-white/5"
+                    >
+                      <ChevronRight size={20} className="text-gray-600 dark:text-gray-300" />
+                    </button>
+                    
+                    <div className="text-center min-w-[120px]">
+                      <p className="font-black text-gray-900 dark:text-white text-lg">
+                        {selectedCharacter === 'sarah' ? 'سارة' : 'دو'}
+                      </p>
+                      <p className="text-xs text-gray-500 font-bold">مدربك الشخصي</p>
+                    </div>
+
+                    <button 
+                      onClick={() => setSelectedCharacter(selectedCharacter === 'sarah' ? 'duo' : 'sarah')}
+                      className="p-3 rounded-full bg-white dark:bg-white/10 shadow-sm hover:bg-gray-100 dark:hover:bg-white/20 transition-all border border-gray-100 dark:border-white/5"
+                    >
+                      <ChevronLeft size={20} className="text-gray-600 dark:text-gray-300" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Message Customization Card */}
+                <section className="space-y-3">
+                  <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
+                    <MessageCircle size={18} />
+                    <h4 className="font-black text-base">تخصيص الرسائل</h4>
+                  </div>
+                  <button 
+                    onClick={() => setIsMessageCustomizationOpen(true)}
+                    className="w-full bg-gray-50 dark:bg-white/5 p-6 rounded-3xl flex items-center justify-between group hover:bg-gray-100 dark:hover:bg-white/10 transition-all border border-transparent hover:border-purple-500/30"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500">
+                        <Edit2 size={24} />
+                      </div>
+                      <div className="text-right">
+                        <p className="font-black text-gray-900 dark:text-white">تعديل رسائل الشخصية</p>
+                        <p className="text-xs text-gray-500 font-bold">تخصيص ما تقوله الشخصية في الفقاعة</p>
+                      </div>
+                    </div>
+                    <ChevronLeft size={20} className="text-gray-400 group-hover:text-purple-500 transition-colors" />
+                  </button>
+                </section>
+              </div>
+
+              <div className="p-4 border-t border-gray-100 dark:border-white/5">
+                <Button variant="primary" className="w-full py-2 text-base" onClick={() => setIsCustomizationOpen(false)}>
+                  حفظ وإغلاق
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
+      {/* Message Customization Full Overlay */}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {isMessageCustomizationOpen && (
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed inset-0 bg-white dark:bg-[#121212] z-[300] flex flex-col transition-colors duration-300"
+            >
+              <div className="p-6 border-b border-gray-100 dark:border-white/5 flex items-center gap-4">
+                <button 
+                  onClick={() => setIsMessageCustomizationOpen(false)}
+                  className="p-2 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 transition-colors"
+                >
+                  <ChevronRight size={24} />
+                </button>
+                <h3 className="text-xl font-black text-gray-900 dark:text-white">تخصيص رسائل الفقاعة</h3>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                {/* Mental Health Messages */}
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-yellow-500">
+                      <Sparkles size={18} />
+                      <h4 className="font-black">رسائل الصحة النفسية</h4>
+                    </div>
+                    <button 
+                      onClick={() => addMessage('mental_health')}
+                      className="p-2 rounded-lg bg-yellow-500/10 text-yellow-600 hover:bg-yellow-500/20 transition-colors"
+                    >
+                      <Plus size={18} />
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    {characterMessages.mental_health.map((msg, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input 
+                          type="text"
+                          value={msg}
+                          onChange={(e) => updateMessage('mental_health', idx, e.target.value)}
+                          className="flex-1 bg-gray-50 dark:bg-white/5 p-3 rounded-xl text-sm font-bold border border-transparent focus:border-yellow-500 outline-none transition-all"
+                        />
+                        <button 
+                          onClick={() => removeMessage('mental_health', idx)}
+                          className="p-3 rounded-xl bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-colors"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Faith Messages */}
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-indigo-500">
+                      <Moon size={18} />
+                      <h4 className="font-black">رسائل الإيمان</h4>
+                    </div>
+                    <button 
+                      onClick={() => addMessage('faith')}
+                      className="p-2 rounded-lg bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20 transition-colors"
+                    >
+                      <Plus size={18} />
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    {characterMessages.faith.map((msg, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input 
+                          type="text"
+                          value={msg}
+                          onChange={(e) => updateMessage('faith', idx, e.target.value)}
+                          className="flex-1 bg-gray-50 dark:bg-white/5 p-3 rounded-xl text-sm font-bold border border-transparent focus:border-indigo-500 outline-none transition-all"
+                        />
+                        <button 
+                          onClick={() => removeMessage('faith', idx)}
+                          className="p-3 rounded-xl bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-colors"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Productivity Messages */}
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-blue-500">
+                      <Zap size={18} />
+                      <h4 className="font-black">رسائل الإنتاجية</h4>
+                    </div>
+                    <button 
+                      onClick={() => addMessage('productivity')}
+                      className="p-2 rounded-lg bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors"
+                    >
+                      <Plus size={18} />
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    {characterMessages.productivity.map((msg, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input 
+                          type="text"
+                          value={msg}
+                          onChange={(e) => updateMessage('productivity', idx, e.target.value)}
+                          className="flex-1 bg-gray-50 dark:bg-white/5 p-3 rounded-xl text-sm font-bold border border-transparent focus:border-blue-500 outline-none transition-all"
+                        />
+                        <button 
+                          onClick={() => removeMessage('productivity', idx)}
+                          className="p-3 rounded-xl bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-colors"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Default Messages */}
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-gray-500">
+                      <MessageCircle size={18} />
+                      <h4 className="font-black">رسائل عامة</h4>
+                    </div>
+                    <button 
+                      onClick={() => addMessage('default')}
+                      className="p-2 rounded-lg bg-gray-500/10 text-gray-600 hover:bg-gray-500/20 transition-colors"
+                    >
+                      <Plus size={18} />
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    {characterMessages.default.map((msg, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input 
+                          type="text"
+                          value={msg}
+                          onChange={(e) => updateMessage('default', idx, e.target.value)}
+                          className="flex-1 bg-gray-50 dark:bg-white/5 p-3 rounded-xl text-sm font-bold border border-transparent focus:border-gray-500 outline-none transition-all"
+                        />
+                        <button 
+                          onClick={() => removeMessage('default', idx)}
+                          className="p-3 rounded-xl bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-colors"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Celebration Messages */}
+                <section className="space-y-4">
+                  <div className="flex items-center gap-2 text-purple-500">
+                    <Trophy size={18} />
+                    <h4 className="font-black">رسائل الاحتفال والإنجاز</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-gray-500 mr-2">عند إنجاز مهمة (بشكل عام)</label>
+                      <input 
+                        type="text"
+                        value={characterMessages.celebration.generic}
+                        onChange={(e) => updateCelebrationMessage('generic', e.target.value)}
+                        className="w-full bg-gray-50 dark:bg-white/5 p-3 rounded-xl text-sm font-bold border border-transparent focus:border-purple-500 outline-none transition-all"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-gray-500 mr-2">عند إكمال فئة بالكامل</label>
+                      <input 
+                        type="text"
+                        value={characterMessages.celebration.completed}
+                        onChange={(e) => updateCelebrationMessage('completed', e.target.value)}
+                        className="w-full bg-gray-50 dark:bg-white/5 p-3 rounded-xl text-sm font-bold border border-transparent focus:border-purple-500 outline-none transition-all"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-gray-500 mr-2">عند إنجاز جزئي</label>
+                      <input 
+                        type="text"
+                        value={characterMessages.celebration.partial}
+                        onChange={(e) => updateCelebrationMessage('partial', e.target.value)}
+                        className="w-full bg-gray-50 dark:bg-white/5 p-3 rounded-xl text-sm font-bold border border-transparent focus:border-purple-500 outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+                </section>
+              </div>
+
+              <div className="p-6 border-t border-gray-100 dark:border-white/5">
+                <button 
+                  onClick={() => setIsMessageCustomizationOpen(false)}
+                  className="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-2xl transition-all shadow-lg shadow-purple-500/25"
+                >
+                  حفظ العبارات
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
       {typeof document !== 'undefined' && createPortal(
         <AnimatePresence>
           {isProgressOpen && (
@@ -842,6 +1435,65 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
           )}
         </AnimatePresence>,
         document.body
+      )}
+
+      {/* Task Management Modal */}
+      {isTaskManagementOpen && selectedCategory && (
+        <div className="fixed inset-0 bg-white dark:bg-[#121212] z-[150] p-6 overflow-y-auto transition-colors duration-300">
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div className="flex items-center justify-between mb-6">
+              <h4 className="text-2xl font-black text-gray-900 dark:text-white">إدارة المهام</h4>
+              <button onClick={() => {
+                setIsTaskManagementOpen(false);
+                setEditingTaskId(null);
+                setEditTaskTitle('');
+              }} className="p-2 rounded-full bg-gray-100 dark:bg-white/10">
+                <X size={24} />
+              </button>
+            </div>
+            
+            {/* Task List in Modal */}
+            <div className="space-y-3">
+              {selectedCategory.tasks.map((task) => (
+                <div key={task.id} className="flex items-center justify-between bg-gray-50 dark:bg-[#1a1a1a] p-4 rounded-2xl">
+                  <span className="text-gray-900 dark:text-white font-bold">{task.title}</span>
+                  <div className="flex gap-2">
+                    <button onClick={() => { setEditingTaskId(task.id); setEditTaskTitle(task.title); }} className="p-2 text-purple-500"><Edit2 size={18} /></button>
+                    <button onClick={() => handleDeleteTask(selectedCategory.id, task.id)} className="p-2 text-red-500"><Trash2 size={18} /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Add/Edit Task Form */}
+            <div className="mt-8 pt-8 border-t border-gray-200 dark:border-white/10">
+              <h5 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{editingTaskId ? 'تعديل المهمة' : 'إضافة مهمة جديدة'}</h5>
+              <input
+                type="text"
+                placeholder="اسم المهمة"
+                value={editTaskTitle}
+                onChange={(e) => setEditTaskTitle(e.target.value)}
+                className="w-full bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-2xl px-6 py-4 text-right text-gray-900 dark:text-white focus:outline-none focus:border-purple-500 text-lg mb-4"
+              />
+              <Button 
+                variant="primary" 
+                className="w-full py-4 text-lg" 
+                onClick={() => {
+                  if (editingTaskId) {
+                    handleEditTask(selectedCategory.id, editingTaskId);
+                  } else {
+                    handleAddTask(selectedCategory.id, editTaskTitle);
+                  }
+                  setEditingTaskId(null);
+                  setEditTaskTitle('');
+                }} 
+                disabled={!editTaskTitle.trim()}
+              >
+                {editingTaskId ? 'حفظ التعديلات' : 'إضافة المهمة'}
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Routine Selection Slide/Drawer */}
@@ -879,12 +1531,99 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                 </div>
 
                 <div className="space-y-3">
+                  {isAddingRoutine ? (
+                    <>
+                      <div className="fixed inset-0 bg-white dark:bg-[#121212] z-[130] p-6 overflow-y-auto transition-colors duration-300">
+                        <div className="max-w-2xl mx-auto space-y-6">
+                          <div className="flex items-center justify-between mb-6">
+                            <h4 className="text-2xl font-black text-gray-900 dark:text-white">إضافة روتين جديد</h4>
+                            <button onClick={() => setIsAddingRoutine(false)} className="p-2 rounded-full bg-gray-100 dark:bg-white/10">
+                              <X size={24} />
+                            </button>
+                          </div>
+                          <input
+                            type="text"
+                            placeholder="اسم الروتين (مثال: روتين العمل)"
+                            value={newRoutineTitle}
+                            onChange={(e) => setNewRoutineTitle(e.target.value)}
+                            className="w-full bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-2xl px-6 py-4 text-right text-gray-900 dark:text-white focus:outline-none focus:border-purple-500 text-lg"
+                          />
+                          <input
+                            type="text"
+                            placeholder="وصف الروتين"
+                            value={newRoutineDesc}
+                            onChange={(e) => setNewRoutineDesc(e.target.value)}
+                            className="w-full bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-2xl px-6 py-4 text-right text-gray-900 dark:text-white focus:outline-none focus:border-purple-500 text-lg"
+                          />
+                          <div>
+                            <p className="text-lg text-gray-700 dark:text-gray-300 mb-4 text-right font-bold">الأيقونة المختارة</p>
+                            <button
+                              onClick={() => setIsIconPickerOpen(true)}
+                              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-2xl text-gray-900 dark:text-white"
+                            >
+                              <span className="text-gray-500">تغيير الأيقونة</span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold">{newRoutineIcon}</span>
+                                {(() => {
+                                  const Icon = (LucideIcons as any)[newRoutineIcon];
+                                  return <Icon size={24} />;
+                                })()}
+                              </div>
+                            </button>
+                          </div>
+                          <Button variant="primary" className="w-full py-4 text-lg" onClick={handleAddRoutine} disabled={!newRoutineTitle.trim()}>
+                            حفظ الروتين الجديد
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      {/* Icon Picker Slide */}
+                      {isIconPickerOpen && (
+                        <div className="fixed inset-0 bg-white dark:bg-[#121212] z-[140] p-6 overflow-y-auto transition-colors duration-300">
+                          <div className="max-w-2xl mx-auto space-y-6">
+                            <div className="flex items-center justify-between mb-6">
+                              <h4 className="text-2xl font-black text-gray-900 dark:text-white">اختر أيقونة</h4>
+                              <button onClick={() => setIsIconPickerOpen(false)} className="p-2 rounded-full bg-gray-100 dark:bg-white/10">
+                                <X size={24} />
+                              </button>
+                            </div>
+                            <div className="flex flex-wrap gap-3 justify-end p-4 border border-gray-200 dark:border-white/10 rounded-2xl">
+                              {AVAILABLE_ICONS.map(iconName => {
+                                const Icon = (LucideIcons as any)[iconName];
+                                return (
+                                  <button
+                                    key={iconName}
+                                    onClick={() => {
+                                      setNewRoutineIcon(iconName);
+                                      setIsIconPickerOpen(false);
+                                    }}
+                                    className={`p-4 rounded-xl border transition-colors ${newRoutineIcon === iconName ? 'bg-purple-500/20 border-purple-500 text-purple-600 dark:text-purple-400' : 'bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-white/10 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5'}`}
+                                  >
+                                    <Icon size={28} />
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => setIsAddingRoutine(true)}
+                      className="w-full p-4 rounded-2xl border border-dashed border-gray-300 dark:border-white/20 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Plus size={20} />
+                      <span className="font-bold">إضافة روتين جديد</span>
+                    </button>
+                  )}
+
                   {routines.map((routine) => {
                     const isSelected = routine.id === selectedRoutineId;
                     
                     // Calculate overall progress for the routine
-                    const totalTasks = routine.categories.reduce((acc, cat) => acc + cat.target, 0);
-                    const completedTasks = routine.categories.reduce((acc, cat) => acc + cat.current, 0);
+                    const totalTasks = routine.categories.reduce((acc, cat) => acc + (cat.tasks ? cat.tasks.length : 0), 0);
+                    const completedTasks = routine.categories.reduce((acc, cat) => acc + (cat.tasks ? cat.tasks.filter(t => t.completed).length : 0), 0);
                     const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
                     return (
@@ -905,29 +1644,41 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                         }`}
                       >
                         <div className="flex items-start justify-between mb-3">
-                          <div className={`mt-1 ml-4 flex-shrink-0 ${isSelected ? 'text-purple-500' : 'text-emerald-500'}`}>
-                            {isSelected ? <CheckCircle2 size={24} /> : <Circle size={24} />}
-                          </div>
-                          <div className="flex-1">
-                            <h5 className={`font-bold text-lg ${isSelected ? 'text-purple-600 dark:text-purple-400' : 'text-gray-900 dark:text-white'}`}>
+                          <div className="flex-1 text-right">
+                            <h5 className={`font-bold text-lg flex items-center gap-2 justify-start ${isSelected ? 'text-purple-600 dark:text-purple-400' : 'text-gray-900 dark:text-white'}`}>
                               {routine.title}
+                              {routine.iconName && (() => {
+                                const Icon = (LucideIcons as any)[routine.iconName] || Circle;
+                                return <Icon size={18} className="text-gray-400" />;
+                              })()}
                             </h5>
                             <p className="text-gray-500 dark:text-gray-400 text-xs mt-1 leading-relaxed">
                               {routine.description}
                             </p>
                           </div>
+                          <div className={`mt-1 mr-4 flex-shrink-0 ${isSelected ? 'text-purple-500' : 'text-emerald-500'}`}>
+                            {isSelected ? <CheckCircle2 size={24} /> : <Circle size={24} />}
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1 h-2 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full rounded-full transition-all duration-1000 ${isSelected ? 'bg-purple-500' : 'bg-emerald-500'}`}
-                              style={{ width: `${progressPercent}%` }}
-                            />
+                        <div className="relative w-full h-5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden mt-2">
+                          <div 
+                            className={`absolute top-0 right-0 h-full rounded-full transition-all duration-1000 flex items-center justify-center ${isSelected ? 'bg-purple-500' : 'bg-emerald-500'}`}
+                            style={{ width: `${progressPercent}%`, minWidth: progressPercent > 0 ? '2rem' : '0' }}
+                          >
+                            {progressPercent > 0 && (
+                              <span className="text-[10px] font-bold text-white">
+                                {progressPercent}%
+                              </span>
+                            )}
                           </div>
-                          <span className={`text-xs font-bold ${isSelected ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-500'}`}>
-                            {progressPercent}%
-                          </span>
+                          {progressPercent === 0 && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">
+                                0%
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </motion.button>
                     );
@@ -965,7 +1716,10 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-xl ${selectedCategory.bg} flex items-center justify-center ${selectedCategory.color}`}>
-                      <selectedCategory.icon size={20} />
+                      {(() => {
+                        const IconComponent = (LucideIcons as any)[selectedCategory.iconName] || Circle;
+                        return <IconComponent size={20} />;
+                      })()}
                     </div>
                     <div>
                       <h4 className="text-lg font-black text-gray-900 dark:text-white">{selectedCategory.title}</h4>
@@ -1045,35 +1799,68 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
 
                 <div className="space-y-3">
                   {selectedCategory.tasks.map((task) => (
-                    <motion.button
-                      key={task.id}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleToggleTask(selectedCategory.id, task.id)}
-                      className={`w-full p-4 rounded-2xl border transition-all flex items-center justify-between text-right ${
-                        task.completed 
-                          ? 'bg-emerald-500/10 border-emerald-500/20' 
-                          : 'bg-gray-50 dark:bg-white/[0.03] border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/[0.05]'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                          task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-200 dark:border-white/10'
-                        }`}>
-                          {task.completed && <Check size={14} strokeWidth={3} />}
+                    <div key={task.id} className="relative group">
+                      {editingTaskId === task.id ? (
+                        <div className="bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/5 rounded-2xl p-4 flex gap-2">
+                          <input
+                            type="text"
+                            value={editTaskTitle}
+                            onChange={(e) => setEditTaskTitle(e.target.value)}
+                            className="flex-1 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-right text-gray-900 dark:text-white focus:outline-none focus:border-purple-500"
+                            autoFocus
+                          />
+                          <button onClick={() => handleEditTask(selectedCategory.id, task.id)} className="p-2 bg-purple-500 text-white rounded-xl hover:bg-purple-600 transition-colors">
+                            <Save size={18} />
+                          </button>
+                          <button onClick={() => setEditingTaskId(null)} className="p-2 bg-gray-200 dark:bg-white/10 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-white/20 transition-colors">
+                            <X size={18} />
+                          </button>
                         </div>
-                        <span className={`font-bold text-sm ${task.completed ? 'text-emerald-600 dark:text-emerald-500' : 'text-gray-900 dark:text-white'}`}>
-                          {task.title}
-                        </span>
-                      </div>
-                    </motion.button>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <motion.button
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => handleToggleTask(selectedCategory.id, task.id)}
+                            className={`flex-1 p-4 rounded-2xl border transition-all flex items-center justify-between text-right ${
+                              task.completed 
+                                ? 'bg-emerald-500/10 border-emerald-500/20' 
+                                : 'bg-gray-50 dark:bg-white/[0.03] border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/[0.05]'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <span className={`font-bold text-sm ${task.completed ? 'text-emerald-600 dark:text-emerald-500' : 'text-gray-900 dark:text-gray-100'}`}>
+                                {task.title}
+                              </span>
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                                task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-200 dark:border-white/10'
+                              }`}>
+                                {task.completed && <Check size={14} strokeWidth={3} />}
+                              </div>
+                            </div>
+                          </motion.button>
+                        </div>
+                      )}
+                    </div>
                   ))}
+
+                    <button
+                      onClick={() => {
+                        setEditingTaskId(null);
+                        setEditTaskTitle('');
+                        setIsTaskManagementOpen(true);
+                      }}
+                      className="w-full mt-4 p-4 rounded-2xl border border-dashed border-gray-300 dark:border-white/20 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Plus size={20} />
+                      <span className="font-bold">إدارة المهام</span>
+                    </button>
                 </div>
               </div>
 
               <div className="p-6 pt-2 border-t border-gray-100 dark:border-white/5 bg-white dark:bg-[#121212]">
                 {(() => {
-                  const progressPercent = Math.min(100, Math.round((selectedCategory.current / selectedCategory.target) * 100));
-                  const isCompleted = progressPercent >= 100;
+                  const progressPercent = selectedCategory.target > 0 ? Math.min(100, Math.round((selectedCategory.current / selectedCategory.target) * 100)) : 0;
+                  const isCompleted = selectedCategory.target > 0 && progressPercent >= 100;
                   const isClaimed = selectedCategory.rewardClaimed;
 
                   return (
