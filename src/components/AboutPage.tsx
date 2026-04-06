@@ -111,7 +111,7 @@ export const AboutPage = ({ onBack }: AboutPageProps) => {
           <ArrowRight size={20} className="md:w-6 md:h-6 group-hover:translate-x-1 transition-transform" />
         </Button>
         <div>
-          <h2 className="text-xl md:text-2xl font-black text-white tracking-tight">عن المنصة</h2>
+          <h2 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">عن المنصة</h2>
           <p className="text-[10px] md:text-xs text-emerald-400 font-bold uppercase tracking-widest">الرؤية والرسالة</p>
         </div>
       </motion.div>
@@ -140,7 +140,7 @@ export const AboutPage = ({ onBack }: AboutPageProps) => {
             <span>مساحتك الآمنة للتطور</span>
           </div>
           
-          <h1 className="text-2xl sm:text-3xl md:text-5xl font-black text-white leading-[1.2] md:leading-[1.1] mb-4 md:mb-6 tracking-tighter">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-black text-gray-900 dark:text-white leading-[1.2] md:leading-[1.1] mb-4 md:mb-6 tracking-tighter">
             منصة النمو الذاتي والوعي <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-blue-400 to-purple-500">
               رحلتك نحو أفضل نسخة من نفسك
@@ -153,17 +153,17 @@ export const AboutPage = ({ onBack }: AboutPageProps) => {
 
           <div className="flex flex-wrap justify-center gap-4 md:gap-6">
             <div className="flex flex-col items-center gap-1 md:gap-2">
-              <div className="text-2xl md:text-4xl font-black text-white">2026</div>
+              <div className="text-2xl md:text-4xl font-black text-gray-900 dark:text-white">2026</div>
               <div className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-widest">عام التغيير الإيجابي</div>
             </div>
-            <div className="w-px h-8 md:h-12 bg-white/10 hidden sm:block" />
+            <div className="w-px h-8 md:h-12 bg-gray-200 dark:bg-white/10 hidden sm:block" />
             <div className="flex flex-col items-center gap-1 md:gap-2">
-              <div className="text-2xl md:text-4xl font-black text-white">+10</div>
+              <div className="text-2xl md:text-4xl font-black text-gray-900 dark:text-white">+10</div>
               <div className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-widest">مسارات تعلم وتطوير</div>
             </div>
-            <div className="w-px h-8 md:h-12 bg-white/10 hidden sm:block" />
+            <div className="w-px h-8 md:h-12 bg-gray-200 dark:bg-white/10 hidden sm:block" />
             <div className="flex flex-col items-center gap-1 md:gap-2">
-              <div className="text-2xl md:text-4xl font-black text-white">∞</div>
+              <div className="text-2xl md:text-4xl font-black text-gray-900 dark:text-white">∞</div>
               <div className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-widest">عادات إيجابية مستدامة</div>
             </div>
           </div>
@@ -183,15 +183,15 @@ export const AboutPage = ({ onBack }: AboutPageProps) => {
             key={idx}
             variants={fadeInScale}
             whileHover={{ y: -5 }}
-            className="relative group p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] bg-[#181818] border border-white/5 overflow-hidden"
+            className="relative group p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] bg-white dark:bg-[#181818] border border-gray-200 dark:border-white/5 overflow-hidden shadow-xl"
           >
             <div className={`absolute inset-0 bg-gradient-to-br ${value.bg} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
             <div className="relative z-10">
-              <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-black/40 flex items-center justify-center mb-4 md:mb-8 border border-white/10 shadow-xl md:shadow-2xl group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gray-100 dark:bg-black/40 flex items-center justify-center mb-4 md:mb-8 border border-gray-200 dark:border-white/10 shadow-xl md:shadow-2xl group-hover:scale-110 transition-transform">
                 {React.cloneElement(value.icon as React.ReactElement, { className: 'w-6 h-6 md:w-7 md:h-7 text-[color:inherit]' })}
               </div>
-              <h3 className="text-lg md:text-2xl font-black text-white mb-2 md:mb-4 tracking-tight">{value.title}</h3>
-              <p className="text-xs md:text-base text-gray-400 leading-relaxed font-medium">
+              <h3 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white mb-2 md:mb-4 tracking-tight">{value.title}</h3>
+              <p className="text-xs md:text-base text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
                 {value.description}
               </p>
             </div>
@@ -211,7 +211,7 @@ export const AboutPage = ({ onBack }: AboutPageProps) => {
             <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
               <Globe size={24} className="md:w-8 md:h-8" />
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-white leading-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-gray-900 dark:text-white leading-tight">
               لماذا نحن؟ <br />
               <span className="text-blue-400">لأن التغيير يبدأ بخطوة.</span>
             </h2>
@@ -230,7 +230,7 @@ export const AboutPage = ({ onBack }: AboutPageProps) => {
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  className="flex items-center gap-2 md:gap-3 text-sm md:text-base text-white font-bold"
+                  className="flex items-center gap-2 md:gap-3 text-sm md:text-base text-gray-900 dark:text-white font-bold"
                 >
                   <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
                     <Zap size={12} className="md:w-3.5 md:h-3.5" />
@@ -248,18 +248,18 @@ export const AboutPage = ({ onBack }: AboutPageProps) => {
             className="relative aspect-square mt-8 lg:mt-0"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-3xl md:rounded-[3rem] blur-2xl md:blur-3xl" />
-            <div className="relative h-full w-full bg-[#181818] border border-white/10 rounded-3xl md:rounded-[3rem] p-6 md:p-12 flex flex-col items-center justify-center text-center overflow-hidden">
+            <div className="relative h-full w-full bg-white dark:bg-[#181818] border border-gray-200 dark:border-white/10 rounded-3xl md:rounded-[3rem] p-6 md:p-12 flex flex-col items-center justify-center text-center overflow-hidden shadow-2xl">
               <FloatingElement duration={5}>
-                <div className="w-20 h-20 md:w-32 md:h-32 bg-emerald-500/20 rounded-2xl md:rounded-[2rem] flex items-center justify-center text-emerald-400 mb-6 md:mb-8 shadow-xl md:shadow-2xl border border-emerald-500/30">
+                <div className="w-20 h-20 md:w-32 md:h-32 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-2xl md:rounded-[2rem] flex items-center justify-center text-emerald-500 dark:text-emerald-400 mb-6 md:mb-8 shadow-xl md:shadow-2xl border border-emerald-500/20 dark:border-emerald-500/30">
                   <Rocket size={40} className="md:w-16 md:h-16" />
                 </div>
               </FloatingElement>
-              <h3 className="text-xl md:text-3xl font-black text-white mb-2 md:mb-4">انطلق نحو التغيير</h3>
-              <p className="text-xs md:text-base text-gray-400 font-medium">نحن نجهزك لتكون أفضل نسخة من نفسك في كل جوانب الحياة.</p>
+              <h3 className="text-xl md:text-3xl font-black text-gray-900 dark:text-white mb-2 md:mb-4">انطلق نحو التغيير</h3>
+              <p className="text-xs md:text-base text-gray-600 dark:text-gray-400 font-medium">نحن نجهزك لتكون أفضل نسخة من نفسك في كل جوانب الحياة.</p>
               
               {/* Decorative Circles */}
-              <div className="absolute -top-5 -right-5 md:-top-10 md:-right-10 w-20 h-20 md:w-40 md:h-40 border border-white/5 rounded-full" />
-              <div className="absolute -bottom-5 -left-5 md:-bottom-10 md:-left-10 w-30 h-30 md:w-60 md:h-60 border border-white/5 rounded-full" />
+              <div className="absolute -top-5 -right-5 md:-top-10 md:-right-10 w-20 h-20 md:w-40 md:h-40 border border-gray-200 dark:border-white/5 rounded-full" />
+              <div className="absolute -bottom-5 -left-5 md:-bottom-10 md:-left-10 w-30 h-30 md:w-60 md:h-60 border border-gray-200 dark:border-white/5 rounded-full" />
             </div>
           </motion.div>
         </div>
@@ -278,7 +278,7 @@ export const AboutPage = ({ onBack }: AboutPageProps) => {
           <Award className="absolute top-1/2 right-5 md:right-10 text-white w-6 h-6 md:w-10 md:h-10" />
         </div>
 
-        <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-white mb-4 md:mb-8 tracking-tight">
+        <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-gray-900 dark:text-white mb-4 md:mb-8 tracking-tight">
           هل أنت مستعد لبدء <br /> <span className="text-emerald-400">رحلة التطور؟</span>
         </h2>
         <p className="text-sm md:text-xl text-gray-400 font-medium mb-6 md:mb-10 max-w-2xl mx-auto">

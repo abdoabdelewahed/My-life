@@ -52,12 +52,13 @@ import RoutinePage from './components/RoutinePage';
 import { StreakModal } from './components/StreakModal';
 import { PointsModal } from './components/PointsModal';
 import AbilitiesPage from './components/AbilitiesPage';
+import { MyLifePage } from './components/MyLifePage';
 import { LEARNING_PATHS, USER_CHARACTERS, PATH_COLORS } from './constants';
 import { playPop, playLevelUp } from './utils/sounds';
 import confetti from 'canvas-confetti';
 import { Button } from './components/ui/Button';
 
-type TabType = 'tasks' | 'tools' | 'roadmap' | 'certificates' | 'menu' | 'about' | 'habits' | 'abilities' | 'settings' | 'store' | 'routine';
+type TabType = 'tasks' | 'tools' | 'roadmap' | 'certificates' | 'menu' | 'about' | 'habits' | 'abilities' | 'settings' | 'store' | 'routine' | 'mylife';
 type PostOnboardingStep = 'none' | 'habits_intro' | 'habits_test' | 'results';
 
 export default function App() {
@@ -141,6 +142,7 @@ export default function App() {
     setIsInstallable(false);
   };
 
+  const [isMyLifeSectionActive, setIsMyLifeSectionActive] = useState(false);
   const [showCharactersModal, setShowCharactersModal] = useState(false);
   const [level, setLevel] = useState(() => parseInt(localStorage.getItem('level') || '1'));
   const [xp, setXp] = useState(() => parseInt(localStorage.getItem('xp') || '0'));
@@ -178,16 +180,33 @@ export default function App() {
   const [showPointsModal, setShowPointsModal] = useState(false);
   const [stats, setStats] = useState(() => JSON.parse(localStorage.getItem('userStats') || '{"lessonsCompleted": 0, "perfectQuizzes": 0, "currentStreak": 0, "pathsCompleted": 0, "totalXP": 0, "lastActiveDate": "", "forgivenessDays": 3}'));
   const [userName, setUserName] = useState(() => localStorage.getItem('userName') || '');
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? saved === 'true' : true; // Default to dark mode
+  });
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', darkMode.toString());
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
   const [visibleTabs, setVisibleTabs] = useState<string[]>(() => {
     const saved = localStorage.getItem('visibleTabs');
     if (saved) {
       const parsed = JSON.parse(saved);
       if (!parsed.includes('routine')) {
-        return [...parsed, 'routine'];
+        parsed.push('routine');
+      }
+      if (!parsed.includes('mylife')) {
+        parsed.push('mylife');
       }
       return parsed;
     }
-    return ['tasks', 'routine', 'abilities', 'menu'];
+    return ['tasks', 'routine', 'mylife', 'menu'];
   });
 
   useEffect(() => {
@@ -260,6 +279,9 @@ export default function App() {
   const handleTabChange = (tabId: TabType) => {
     playPop();
     setActiveTab(tabId);
+    if (tabId !== 'mylife') {
+      setIsMyLifeSectionActive(false);
+    }
   };
 
   const handleActivityComplete = (xpGained: number) => {
@@ -417,7 +439,7 @@ export default function App() {
     const allTabs = [
       { id: 'tasks', label: 'الرئيسية', icon: <Home size={20} /> },
       { id: 'routine', label: 'روتيني', icon: <Activity size={20} /> },
-      { id: 'abilities', label: 'قدراتي', icon: <Brain size={20} /> },
+      { id: 'mylife', label: 'حياتي', icon: <Heart size={20} /> },
       { id: 'menu', label: 'القائمة', icon: <Menu size={20} /> },
     ] as const;
     return allTabs.filter(tab => visibleTabs.includes(tab.id));
@@ -449,7 +471,7 @@ export default function App() {
   }, [soundEnabled]);
 
   return (
-    <div className={`min-h-screen bg-[#121212] font-sans text-white ${activePathColor.selection} pb-24 md:pb-0 overflow-x-hidden`}>
+    <div className={`min-h-screen bg-gray-50 dark:bg-[#121212] font-sans text-gray-900 dark:text-white ${activePathColor.selection} pb-24 md:pb-0 overflow-x-hidden transition-colors duration-300`}>
       <AnimatePresence mode="wait">
         {showOnboarding ? (
           <motion.div
@@ -467,7 +489,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#121212] z-[100] overflow-hidden"
+            className="fixed inset-0 bg-gray-50 dark:bg-[#121212] z-[100] overflow-hidden"
           >
             <AnimatePresence mode="wait">
               {postOnboardingStep === 'habits_intro' && (
@@ -476,18 +498,18 @@ export default function App() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="fixed inset-0 flex flex-col bg-[#121212] z-[110]"
+                  className="fixed inset-0 flex flex-col bg-gray-50 dark:bg-[#121212] z-[110]"
                 >
                   <div className="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center text-center max-w-2xl mx-auto w-full">
                     <div className="w-20 h-20 md:w-24 md:h-24 bg-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-400 mx-auto mb-6 md:mb-8">
                       <Activity className="w-10 h-10 md:w-12 md:h-12" />
                     </div>
-                    <h2 className="text-3xl md:text-5xl font-black text-white mb-4 md:mb-6 leading-tight">اختبار العادات</h2>
-                    <p className="text-base md:text-xl text-gray-400 mb-8 md:mb-12 leading-relaxed px-2">
+                    <h2 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white mb-4 md:mb-6 leading-tight">اختبار العادات</h2>
+                    <p className="text-base md:text-xl text-gray-600 dark:text-gray-400 mb-8 md:mb-12 leading-relaxed px-2">
                       قبل أن نبدأ رحلتك، نحتاج لفهم عاداتك الحالية. هذا الاختبار سيساعدنا على رسم خريطة طريق مخصصة لك.
                     </p>
                   </div>
-                  <div className="p-6 border-t border-white/10 bg-[#121212] flex flex-col items-center gap-4 w-full">
+                  <div className="p-6 border-t border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#121212] flex flex-col items-center gap-4 w-full">
                     <Button 
                       onClick={() => setPostOnboardingStep('habits_test')}
                       variant="success"
@@ -506,7 +528,7 @@ export default function App() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="fixed inset-0 overflow-y-auto bg-[#0a0a0a]"
+                  className="fixed inset-0 overflow-y-auto bg-gray-50 dark:bg-[#0a0a0a]"
                 >
                   <HabitsPage 
                     onComplete={() => setPostOnboardingStep('results')} 
@@ -521,7 +543,7 @@ export default function App() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="fixed inset-0 overflow-y-auto bg-[#0a0a0a]"
+                  className="fixed inset-0 overflow-y-auto bg-gray-50 dark:bg-[#0a0a0a]"
                 >
                   <HabitsPage 
                     onComplete={handleHabitsResultsComplete} 
@@ -540,7 +562,7 @@ export default function App() {
             className="relative"
           >
           {/* Animated Spotify-like Header Gradient with Ethereal Blobs */}
-          <div className={`absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b ${activePathColor.gradientFrom} via-[#121212]/80 to-[#121212] -z-10 pointer-events-none overflow-hidden`}>
+          <div className={`absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b ${activePathColor.gradientFrom} via-white/80 dark:via-[#121212]/80 to-white dark:to-[#121212] -z-10 pointer-events-none overflow-hidden`}>
             <motion.div
               animate={{
                 x: [0, 50, -50, 0],
@@ -574,8 +596,8 @@ export default function App() {
           {/* Header */}
           {(activeTab !== 'habits' || habitsView === 'test_selection' || habitsView === 'results') && 
            (activeTab !== 'abilities' || abilitiesView === 'dashboard' || abilitiesView === 'library') &&
-           activeTab !== 'about' && activeTab !== 'settings' && activeTab !== 'store' && activeTab !== 'certificates' && activeTab !== 'routine' && (
-            <header className="sticky top-0 z-40 bg-[#121212]/40 backdrop-blur-2xl border-b border-white/5 transition-all duration-300">
+           activeTab !== 'about' && activeTab !== 'settings' && activeTab !== 'store' && activeTab !== 'certificates' && !isMyLifeSectionActive && (
+            <header className="sticky top-0 z-40 bg-white/40 dark:bg-[#121212]/40 backdrop-blur-2xl border-b border-gray-200 dark:border-white/5 transition-all duration-300">
               <div className="max-w-6xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
                 <motion.div 
                   initial={{ opacity: 0, x: -20 }}
@@ -594,12 +616,12 @@ export default function App() {
                   </div>
                   <div className="flex flex-col items-start justify-center">
                     <div className="flex items-center gap-1.5">
-                      <h1 className="font-black text-xs md:text-sm tracking-tight text-white">{currentCharacter.name}</h1>
+                      <h1 className="font-black text-xs md:text-sm tracking-tight text-gray-900 dark:text-white">{currentCharacter.name}</h1>
                       <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
                     </div>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-gray-400">مستوى {level}</span>
-                      <div className="w-10 h-0.5 bg-white/10 rounded-full overflow-hidden">
+                      <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">مستوى {level}</span>
+                      <div className="w-10 h-0.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
                         <motion.div 
                           initial={{ width: 0 }}
                           animate={{ width: `${levelProgress * 100}%` }}
@@ -613,7 +635,7 @@ export default function App() {
                 {/* Stats in App Bar */}
                 <div className="flex items-center gap-3 md:gap-4 pb-0 pt-[3px] pr-4">
                   <div 
-                    className="hidden sm:flex items-center gap-3 bg-white/[0.03] px-3 py-1.5 rounded-2xl border border-white/5 backdrop-blur-md cursor-pointer hover:bg-white/[0.08] transition-all"
+                    className="hidden sm:flex items-center gap-3 bg-gray-100 dark:bg-white/[0.03] px-3 py-1.5 rounded-2xl border border-gray-200 dark:border-white/5 backdrop-blur-md cursor-pointer hover:bg-gray-200 dark:hover:bg-white/[0.08] transition-all"
                     onClick={() => {
                       setShowStreakModal(true);
                       playPop();
@@ -621,9 +643,9 @@ export default function App() {
                   >
                     <div className="flex items-center gap-2">
                       <Flame className="text-orange-500 w-3.5 h-3.5 md:w-4 md:h-4" fill="currentColor" />
-                      <span className="font-black text-xs md:text-sm text-white">{stats.currentStreak || 0}<span className="text-white/30 text-[9px] ml-0.5">/30</span></span>
+                      <span className="font-black text-xs md:text-sm text-gray-900 dark:text-white">{stats.currentStreak || 0}<span className="text-gray-400 dark:text-white/30 text-[9px] ml-0.5">/30</span></span>
                     </div>
-                    <div className="w-px h-3 bg-white/10" />
+                    <div className="w-px h-3 bg-gray-300 dark:bg-white/10" />
                     <div 
                       className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
                       onClick={(e) => {
@@ -633,11 +655,11 @@ export default function App() {
                       }}
                     >
                       <Zap className="text-amber-500 w-3.5 h-3.5 md:w-4 md:h-4" fill="currentColor" />
-                      <span className="font-black text-xs md:text-sm text-white">{xp}</span>
+                      <span className="font-black text-xs md:text-sm text-gray-900 dark:text-white">{xp}</span>
                     </div>
                   </div>
               
-              <nav className="hidden md:flex items-center gap-1 bg-white/[0.03] p-1 rounded-2xl backdrop-blur-xl border border-white/5">
+              <nav className="hidden md:flex items-center gap-1 bg-gray-100 dark:bg-white/[0.03] p-1 rounded-2xl backdrop-blur-xl border border-gray-200 dark:border-white/5">
                 {tabs.map((tab) => (
                   <Button 
                     key={tab.id}
@@ -645,13 +667,13 @@ export default function App() {
                     variant={activeTab === tab.id ? "primary" : "ghost"}
                     size="sm"
                     className={`relative rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer h-8 px-4 ${
-                      activeTab === tab.id ? 'text-black' : 'text-gray-400 hover:text-white'
+                      activeTab === tab.id ? 'text-white dark:text-black' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                     }`}
                   >
                     {activeTab === tab.id && (
                       <motion.div 
                         layoutId="activeTabDesktop" 
-                        className="absolute inset-0 bg-white shadow-2xl rounded-xl"
+                        className="absolute inset-0 bg-gray-900 dark:bg-white shadow-2xl rounded-xl"
                         transition={{ type: "spring", stiffness: 500, damping: 35 }}
                       />
                     )}
@@ -666,24 +688,24 @@ export default function App() {
               {/* Mobile Stats Only */}
               <div className="flex sm:hidden items-center gap-2">
                 <div 
-                  className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all"
+                  className="flex items-center gap-1.5 bg-gray-100 dark:bg-white/5 px-3 py-1.5 rounded-full border border-gray-200 dark:border-white/10 cursor-pointer active:scale-95 transition-all"
                   onClick={() => {
                     setShowStreakModal(true);
                     playPop();
                   }}
                 >
                   <Flame className="text-orange-500 w-4 h-4" fill="currentColor" />
-                  <span className="font-black text-xs text-white">{stats.currentStreak || 0}<span className="text-white/30 text-[8px] ml-0.5">/30</span></span>
+                  <span className="font-black text-xs text-gray-900 dark:text-white">{stats.currentStreak || 0}<span className="text-gray-400 dark:text-white/30 text-[8px] ml-0.5">/30</span></span>
                 </div>
                 <div 
-                  className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 pr-3 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all"
+                  className="flex items-center gap-1.5 bg-gray-100 dark:bg-white/5 px-3 py-1.5 pr-3 rounded-full border border-gray-200 dark:border-white/10 cursor-pointer active:scale-95 transition-all"
                   onClick={() => {
                     setShowPointsModal(true);
                     playPop();
                   }}
                 >
                   <Zap className="text-amber-500 w-4 h-4" fill="currentColor" />
-                  <span className="font-black text-xs text-white">{xp}</span>
+                  <span className="font-black text-xs text-gray-900 dark:text-white">{xp}</span>
                 </div>
               </div>
             </div>
@@ -720,11 +742,11 @@ export default function App() {
             {activeTab === 'routine' && (
               <RoutinePage onActivityComplete={handleActivityComplete} />
             )}
-            {activeTab === 'abilities' && (
-              <AbilitiesPage 
-                onComplete={() => setActiveTab('tasks')}
-                onViewChange={setAbilitiesView}
+            {activeTab === 'mylife' && (
+              <MyLifePage 
+                onSectionChange={setIsMyLifeSectionActive} 
                 onActivityComplete={handleActivityComplete}
+                onAbilitiesViewChange={setAbilitiesView}
               />
             )}
             {activeTab === 'menu' && (
@@ -750,6 +772,8 @@ export default function App() {
                 setSoundEnabled={setSoundEnabled}
                 visibleTabs={visibleTabs}
                 setVisibleTabs={setVisibleTabs}
+                darkMode={darkMode}
+                setDarkMode={setDarkMode}
               />
             )}
             {activeTab === 'about' && (
@@ -769,7 +793,7 @@ export default function App() {
 
       {/* Footer */}
       {activeTab !== 'about' && (
-        <footer className="hidden md:block bg-[#121212] border-t border-white/5 py-10 mt-12 ether-gradient">
+        <footer className="hidden md:block bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-white/5 py-10 mt-12 ether-gradient">
           <div className="max-w-6xl mx-auto px-4 text-center">
             <p className="text-gray-200 text-sm font-bold tracking-wide">
               منصة النمو الذاتي والوعي 2026 &copy; مساحتك الآمنة للتطور.
@@ -783,8 +807,8 @@ export default function App() {
         postOnboardingStep === 'none' && 
         (activeTab !== 'habits' || habitsView === 'test_selection' || habitsView === 'results') && 
         (activeTab !== 'abilities' || abilitiesView === 'dashboard' || abilitiesView === 'library') &&
-        activeTab !== 'about' && activeTab !== 'settings' && activeTab !== 'store' && activeTab !== 'certificates') && (
-        <nav className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[450px] bg-[#1a2e26] backdrop-blur-3xl border border-white/10 z-50 p-2 flex justify-between items-center shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-3xl gap-2">
+        activeTab !== 'about' && activeTab !== 'settings' && activeTab !== 'store' && activeTab !== 'certificates' && !isMyLifeSectionActive) && (
+        <nav className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[450px] bg-white dark:bg-[#1a2e26] backdrop-blur-3xl border border-gray-200 dark:border-white/10 z-50 p-2 flex justify-between items-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-3xl gap-2">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -794,7 +818,7 @@ export default function App() {
                 variant={isActive ? "primary" : "ghost"}
                 size="sm"
                 className={`relative flex items-center justify-center gap-1 rounded-2xl transition-all cursor-pointer flex-1 h-10 ${
-                  isActive ? 'bg-white text-black' : 'text-gray-300 hover:text-white'
+                  isActive ? 'bg-gray-900 text-white dark:bg-white dark:text-black' : 'text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 <div className="relative z-10 flex items-center gap-2">
@@ -839,19 +863,19 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed inset-0 bg-[#121212] z-[70] overflow-y-auto flex flex-col"
+            className="fixed inset-0 bg-gray-50 dark:bg-[#121212] z-[70] overflow-y-auto flex flex-col"
           >
             {/* App Bar */}
-            <div className="sticky top-0 z-[80] bg-[#121212]/80 backdrop-blur-xl border-b border-white/10 px-4 py-4 flex items-center gap-4">
+            <div className="sticky top-0 z-[80] bg-white/80 dark:bg-[#121212]/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/10 px-4 py-4 flex items-center gap-4">
               <Button 
                 onClick={() => setShowFullRoadmap(false)}
                 variant="ghost"
                 size="sm"
-                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-colors border border-white/10 p-0"
+                className="w-10 h-10 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 flex items-center justify-center text-gray-900 dark:text-white transition-colors border border-gray-200 dark:border-white/10 p-0"
               >
                 <X size={20} />
               </Button>
-              <h2 className="text-xl font-black text-white">استكشف المسارات</h2>
+              <h2 className="text-xl font-black text-gray-900 dark:text-white">استكشف المسارات</h2>
             </div>
             
             <div className="p-4 md:p-8 max-w-7xl mx-auto w-full flex-1">

@@ -196,14 +196,14 @@ export const LessonFlow: React.FC<LessonFlowProps> = ({ step, onClose, onComplet
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 50 }}
-      className="fixed inset-0 z-50 bg-[#121212] flex flex-col overflow-hidden"
+      className="fixed inset-0 z-50 bg-app-bg flex flex-col overflow-hidden"
     >
       {/* Header */}
       <div className="flex items-center gap-4 p-4 md:p-6">
-        <Button onClick={handleClose} variant="ghost" size="sm" className="p-2 hover:bg-[#282828] rounded-full transition-colors">
-          <X size={24} className="text-[#b3b3b3] hover:text-white" />
+        <Button onClick={handleClose} variant="ghost" size="sm" className="p-2 hover:bg-app-surface rounded-full transition-colors">
+          <X size={24} className="text-app-text-secondary hover:text-app-text-primary" />
         </Button>
-        <div className="flex-1 h-3 bg-[#282828] rounded-full overflow-hidden">
+        <div className="flex-1 h-3 bg-app-surface rounded-full overflow-hidden">
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
@@ -212,20 +212,20 @@ export const LessonFlow: React.FC<LessonFlowProps> = ({ step, onClose, onComplet
         </div>
         
         {/* Font Size Controls */}
-        <div className="flex items-center gap-2 bg-[#282828] rounded-full p-1 border border-white/5">
+        <div className="flex items-center gap-2 bg-app-surface rounded-full p-1 border border-app-border">
           <Button 
             onClick={decreaseFontSize}
             variant="ghost"
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-white transition-colors p-0"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-app-bg text-app-text-primary transition-colors p-0"
             title="تصغير الخط"
           >
             <span className="text-sm font-bold">-A</span>
           </Button>
-          <div className="w-[1px] h-4 bg-white/10" />
+          <div className="w-[1px] h-4 bg-app-border" />
           <Button 
             onClick={increaseFontSize}
             variant="ghost"
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-white transition-colors p-0"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-app-bg text-app-text-primary transition-colors p-0"
             title="تكبير الخط"
           >
             <span className="text-lg font-bold">+A</span>
@@ -245,14 +245,14 @@ export const LessonFlow: React.FC<LessonFlowProps> = ({ step, onClose, onComplet
               className="flex-1 flex flex-col justify-center"
             >
               <div className="flex items-center justify-between mb-3 md:mb-4">
-                <h2 className="text-lg md:text-2xl font-black text-white">{step?.title}</h2>
+                <h2 className="text-lg md:text-2xl font-black text-app-text-primary">{step?.title}</h2>
                 <div className="flex items-center gap-2">
                   {isAudioAvailable && (
                     <Button 
                       onClick={handleSpeak}
                       variant="ghost"
                       disabled={isGeneratingAudio}
-                      className={`p-2.5 rounded-full transition-all h-auto ${isPlaying ? `${color.bg} text-black` : 'bg-[#282828] text-white hover:bg-[#333]'}`}
+                      className={`p-2.5 rounded-full transition-all h-auto ${isPlaying ? `${color.bg} text-black` : 'bg-app-surface text-app-text-primary hover:bg-app-surface/80'}`}
                       title="استمع للنص"
                     >
                       {isGeneratingAudio ? <Loader2 size={20} className="animate-spin" /> : (isPlaying ? <VolumeX size={20} /> : <Volume2 size={20} />)}
@@ -261,9 +261,9 @@ export const LessonFlow: React.FC<LessonFlowProps> = ({ step, onClose, onComplet
                 </div>
               </div>
               
-              <div className="bg-[#181818]/60 backdrop-blur-md p-4 md:p-7 rounded-2xl md:rounded-3xl border border-white/10 shadow-2xl overflow-y-auto max-h-[55vh] relative">
+              <div className="bg-app-surface/60 backdrop-blur-md p-4 md:p-7 rounded-2xl md:rounded-3xl border border-app-border shadow-2xl overflow-y-auto max-h-[55vh] relative">
                 <p 
-                  className="leading-relaxed text-gray-200 whitespace-pre-wrap transition-all duration-200"
+                  className="leading-relaxed text-app-text-primary whitespace-pre-wrap transition-all duration-200"
                   style={{ fontSize: `${fontSize}px` }}
                 >
                   {contentPages[contentPage]}
@@ -284,7 +284,7 @@ export const LessonFlow: React.FC<LessonFlowProps> = ({ step, onClose, onComplet
             >
               <div className="flex-1 flex flex-col items-center justify-center overflow-y-auto relative">
                 <h2 
-                  className="font-black text-white text-center transition-all duration-200 px-8"
+                  className="font-black text-app-text-primary text-center transition-all duration-200 px-8"
                   style={{ fontSize: `${Math.max(fontSize * 1.2, 20)}px`, lineHeight: 1.4 }}
                 >
                   {step?.quiz?.question}
@@ -306,7 +306,7 @@ export const LessonFlow: React.FC<LessonFlowProps> = ({ step, onClose, onComplet
                         className={`w-full p-4 md:p-6 rounded-xl md:rounded-2xl text-right font-bold border-2 transition-all flex justify-between items-center h-auto ${
                           isRight ? `${color.lightBg} ${color.border} ${color.text}` :
                           isWrong ? 'bg-red-500/20 border-red-500 text-red-500' :
-                          'bg-[#181818] border-white/5 text-white hover:border-white/20 hover:bg-[#282828]'
+                          'bg-app-surface border-app-border text-app-text-primary hover:border-app-text-secondary hover:bg-app-surface/80'
                         }`}
                         style={{ fontSize: `${Math.max(fontSize * 0.9, 14)}px` }}
                       >
@@ -348,7 +348,7 @@ export const LessonFlow: React.FC<LessonFlowProps> = ({ step, onClose, onComplet
               >
                 <Trophy size={64} className="md:w-20 md:h-20 text-black" />
               </motion.div>
-              <h2 className="text-3xl md:text-5xl font-black mb-3 md:mb-4 text-white">أحسنت!</h2>
+              <h2 className="text-3xl md:text-5xl font-black mb-3 md:mb-4 text-app-text-primary">أحسنت!</h2>
               <p className={`text-lg md:text-2xl ${color.text} font-bold flex items-center justify-center gap-2`}>
                 <Sparkles size={20} className="md:w-6 md:h-6" />
                 +{step?.xp || 0} نقطة خبرة
@@ -359,7 +359,7 @@ export const LessonFlow: React.FC<LessonFlowProps> = ({ step, onClose, onComplet
       </div>
 
       {/* Footer Action */}
-      <div className="p-4 md:p-8 border-t border-white/5 bg-[#121212]">
+      <div className="p-4 md:p-8 border-t border-app-border bg-app-bg">
         <div className="max-w-3xl mx-auto">
           {stage === 'content' && (
             <div className="flex gap-3 md:gap-4">

@@ -69,6 +69,29 @@ export function CharactersModal({
 
   const topStat = radarData.reduce((prev, current) => (prev.A > current.A) ? prev : current);
 
+  // Calculate dynamic stats for dashboard
+  const abilitiesResults = JSON.parse(localStorage.getItem('abilitiesResults') || '{}');
+  const completedAbilitiesCount = Object.keys(abilitiesResults).length;
+  const totalAbilitiesCount = 4; // traits, confidence, skills, financial_capability
+  const abilitiesPercentage = Math.min(100, Math.round((completedAbilitiesCount / totalAbilitiesCount) * 100));
+
+  const myRoutine = JSON.parse(localStorage.getItem('myRoutine') || '[]');
+  let totalRoutineTasks = 0;
+  let completedRoutineTasks = 0;
+  
+  myRoutine.forEach((area: any) => {
+    area.groups?.forEach((group: any) => {
+      group.tasks?.forEach((task: any) => {
+        totalRoutineTasks++;
+        if (task.completed) completedRoutineTasks++;
+      });
+    });
+  });
+  
+  const routinePercentage = totalRoutineTasks > 0 
+    ? Math.min(100, Math.round((completedRoutineTasks / totalRoutineTasks) * 100))
+    : 0;
+
   return (
     <div className="fixed inset-0 z-[100] bg-[#0a0a0a] flex flex-col overflow-y-auto font-sans" dir="rtl">
       {/* Header */}
@@ -297,7 +320,7 @@ export function CharactersModal({
             <h3 className="text-2xl font-black text-white tracking-tight">لوحة التحكم الموحدة</h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Abilities Summary */}
             <div className="bg-[#181818] p-6 rounded-3xl border border-white/5 shadow-xl relative overflow-hidden group hover:border-blue-500/30 transition-colors">
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -z-10 group-hover:bg-blue-500/10 transition-colors" />
@@ -307,14 +330,22 @@ export function CharactersModal({
                   القدرات
                 </h4>
                 <span className="text-xs font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded-md">
-                  {Object.keys(JSON.parse(localStorage.getItem('abilitiesResults') || '{}')).length} مقاييس
+                  {completedAbilitiesCount} / {totalAbilitiesCount} مقاييس
                 </span>
               </div>
               <p className="text-sm text-gray-400 mb-4 leading-relaxed">
                 تتبع تطور مهاراتك وقدراتك عبر الزمن من خلال المقاييس النفسية والعملية.
               </p>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">نسبة الإنجاز</span>
+                <span className="text-xs font-black text-blue-400">{abilitiesPercentage}%</span>
+              </div>
               <div className="w-full bg-black/40 h-2 rounded-full overflow-hidden">
-                <div className="bg-blue-500 h-full w-[60%]" />
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${abilitiesPercentage}%` }}
+                  className="bg-blue-500 h-full" 
+                />
               </div>
             </div>
 
@@ -327,34 +358,22 @@ export function CharactersModal({
                   الروتين
                 </h4>
                 <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-md">
-                  {JSON.parse(localStorage.getItem('myRoutine') || '[]').reduce((acc: number, area: any) => acc + area.groups.reduce((gAcc: number, g: any) => gAcc + g.tasks.filter((t: any) => t.completed).length, 0), 0)} مهام منجزة
+                  {completedRoutineTasks} مهام منجزة
                 </span>
               </div>
               <p className="text-sm text-gray-400 mb-4 leading-relaxed">
                 التزامك اليومي بالمهام المحددة يبني أساساً قوياً للنجاح المستمر.
               </p>
-              <div className="w-full bg-black/40 h-2 rounded-full overflow-hidden">
-                <div className="bg-emerald-500 h-full w-[45%]" />
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">نسبة الإنجاز</span>
+                <span className="text-xs font-black text-emerald-400">{routinePercentage}%</span>
               </div>
-            </div>
-
-            {/* Habits Summary */}
-            <div className="bg-[#181818] p-6 rounded-3xl border border-white/5 shadow-xl relative overflow-hidden group hover:border-purple-500/30 transition-colors">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl -z-10 group-hover:bg-purple-500/10 transition-colors" />
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Zap className="text-purple-400" size={18} />
-                  العادات
-                </h4>
-                <span className="text-xs font-bold text-purple-400 bg-purple-500/10 px-2 py-1 rounded-md">
-                  مؤشر القوة 70%
-                </span>
-              </div>
-              <p className="text-sm text-gray-400 mb-4 leading-relaxed">
-                تحليل وتطوير عاداتك اليومية لضمان توافقها مع أهدافك الكبرى.
-              </p>
               <div className="w-full bg-black/40 h-2 rounded-full overflow-hidden">
-                <div className="bg-purple-500 h-full w-[70%]" />
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${routinePercentage}%` }}
+                  className="bg-emerald-500 h-full" 
+                />
               </div>
             </div>
           </div>

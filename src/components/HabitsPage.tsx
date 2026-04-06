@@ -3,14 +3,14 @@ import { motion, AnimatePresence } from 'motion/react';
 import * as Lucide from 'lucide-react';
 const { 
   Heart, Zap, Wallet, Users, Brain, ArrowRight, 
-  CheckCircle2, AlertCircle, ChevronRight, ShieldAlert, 
+  CheckCircle2, AlertCircle, ChevronRight, ChevronLeft, ShieldAlert, 
   Sparkles, Activity, Target, RefreshCw, ArrowLeft, Flame, Play, Crown, X, RotateCcw, Rocket, Moon, Star
 } = Lucide;
 import { playPop, playLevelUp } from '../utils/sounds';
 import confetti from 'canvas-confetti';
 import { Button } from './ui/Button';
 
-type View = 'intro' | 'test_selection' | 'test' | 'area_result' | 'result_summary' | 'results' | 'review';
+type View = 'intro' | 'test_selection' | 'test' | 'area_result' | 'result_summary' | 'results' | 'review' | 'bright_side' | 'dark_side' | 'habit_detail';
 type TestType = 'simple' | 'comprehensive';
 
 
@@ -410,6 +410,8 @@ interface HabitsPageProps {
 
 export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onActivityComplete }: HabitsPageProps) => {
   const [view, setView] = useState<View>(() => initialView || (localStorage.getItem('habits_view') as View) || 'intro');
+  const [selectedHabit, setSelectedHabit] = useState<any>(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   useEffect(() => {
     console.log('HabitsPage mounted');
@@ -551,10 +553,22 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
     return goodHabits;
   }, [answers, filteredAreas]);
 
+  useEffect(() => {
+    // Also save the purity score for use in other pages
+    const totalQuestionsAnswered = (Object.values(answers) as Record<number, number>[]).reduce((acc: number, curr: Record<number, number>) => acc + Object.keys(curr).length, 0);
+    if (totalQuestionsAnswered > 0) {
+      const badAnswersCount = detectedBadHabits.length;
+      const score = Math.max(0, Math.round(((Number(totalQuestionsAnswered) - Number(badAnswersCount)) / Number(totalQuestionsAnswered)) * 100));
+      localStorage.setItem('habits_score', score.toString());
+    } else {
+      localStorage.removeItem('habits_score');
+    }
+  }, [answers, detectedBadHabits]);
+
   // Calculate a "Purity Score" (100 - penalty for bad habits)
   const purityScore = useMemo(() => {
     if (completedAreasCount === 0) return 0;
-    const totalQuestionsAnswered = Object.values(answers).reduce((acc: number, curr) => acc + Object.keys(curr).length, 0);
+    const totalQuestionsAnswered = (Object.values(answers) as Record<number, number>[]).reduce((acc: number, curr: Record<number, number>) => acc + Object.keys(curr).length, 0);
     if (totalQuestionsAnswered === 0) return 0;
     
     const badAnswersCount = detectedBadHabits.length;
@@ -846,7 +860,7 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
           </motion.div>
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 p-6 md:p-10 border-t border-white/10 bg-[#0a0a0a] z-20">
+        <div className="fixed bottom-0 left-0 right-0 p-6 md:p-10 border-t border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] z-20">
           <div className="max-w-2xl mx-auto flex gap-4">
             {onBack && (
               <Button
@@ -1231,13 +1245,18 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
 
   const handleReset = () => {
     setAnswers({});
+    setCurrentStep(0);
+    setActiveAreaId(null);
     setTestFinished(false);
     handleSetView('intro');
     localStorage.removeItem('habits_answers');
     localStorage.removeItem('habits_active_area');
     localStorage.removeItem('habits_current_step');
+    localStorage.removeItem('habits_test_finished');
     localStorage.removeItem('habits_view');
     localStorage.removeItem('habits_recovery_tasks');
+    localStorage.removeItem('habits_score');
+    setShowResetConfirm(false);
   };
 
 
@@ -1251,7 +1270,7 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[60] flex flex-col overflow-hidden bg-[#0a0a0a]"
+        className="fixed inset-0 z-[60] flex flex-col overflow-hidden bg-white dark:bg-[#0a0a0a]"
       >
         <div className="absolute inset-0 bg-indigo-500/5 opacity-30 blur-[120px] pointer-events-none" />
         <div className="absolute inset-0 bg-atmospheric opacity-40 pointer-events-none" />
@@ -1270,6 +1289,17 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
               <X size={20} />
             </Button>
           )}
+          <h2 className="text-xl font-black text-white">ملخص النتيجة</h2>
+          <Button 
+            onClick={() => {
+              playPop();
+              setShowResetConfirm(true);
+            }}
+            variant="ghost"
+            className="w-10 h-10 p-0 flex items-center justify-center bg-white/5 hover:bg-white/10 text-white rounded-full"
+          >
+            <RotateCcw size={20} />
+          </Button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col items-center justify-center relative z-10">
@@ -1339,10 +1369,10 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[70] flex flex-col bg-[#0a0a0a] overflow-hidden"
+        className="fixed inset-0 z-[70] flex flex-col bg-white dark:bg-[#0a0a0a] overflow-hidden"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-white/5 bg-white dark:bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
           <Button 
             onClick={() => {
               playPop();
@@ -1353,128 +1383,140 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
           >
             <X size={20} />
           </Button>
-          <h2 className="text-xl font-black text-white">نتائج تحليل العادات</h2>
-          <div className="w-10" />
+          <h2 className="text-xl font-black text-white">تحليل العادات</h2>
+          <Button 
+            onClick={() => {
+              playPop();
+              setShowResetConfirm(true);
+            }}
+            variant="ghost"
+            className="w-10 h-10 p-0 flex items-center justify-center bg-white/5 hover:bg-white/10 text-white rounded-full"
+          >
+            <RotateCcw size={20} />
+          </Button>
         </div>
 
+        <AnimatePresence>
+          {showResetConfirm && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-[#1a1a1a] border border-white/10 rounded-[2.5rem] p-8 max-w-sm w-full text-center space-y-6"
+              >
+                <div className="w-20 h-20 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto text-rose-500">
+                  <RotateCcw size={40} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-black text-white">إعادة الاختبار؟</h3>
+                  <p className="text-gray-400 font-bold">سيتم مسح جميع إجاباتك الحالية والبدء من جديد.</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button
+                    onClick={() => setShowResetConfirm(false)}
+                    variant="ghost"
+                    className="h-14 rounded-2xl font-black bg-white/5 hover:bg-white/10 text-white"
+                  >
+                    إلغاء
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      playPop();
+                      handleReset();
+                    }}
+                    className="h-14 rounded-2xl font-black bg-rose-600 hover:bg-rose-500 text-white"
+                  >
+                    تأكيد الإعادة
+                  </Button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 pb-12">
-          {/* Score Card */}
+        <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 pb-32">
+          {/* Top Cards Section */}
+          <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+            <motion.div
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              className="bg-emerald-500/10 border-2 border-emerald-500/20 rounded-[2rem] p-6 text-center backdrop-blur-xl"
+            >
+              <div className="text-4xl md:text-5xl font-black text-emerald-400 mb-2">{positiveHabitsCount}</div>
+              <div className="text-emerald-300/80 font-bold text-sm md:text-base">الجانب المشرق</div>
+            </motion.div>
+
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              className="bg-rose-500/10 border-2 border-rose-500/20 rounded-[2rem] p-6 text-center backdrop-blur-xl"
+            >
+              <div className="text-4xl md:text-5xl font-black text-rose-400 mb-2">{negativeHabitsCount}</div>
+              <div className="text-rose-300/80 font-bold text-sm md:text-base">الجانب المظلم</div>
+            </motion.div>
+          </div>
+
+          {/* Advice Card */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="w-full max-w-2xl mx-auto p-8 md:p-12 rounded-[2.5rem] border-2 border-b-8 border-indigo-500/20 bg-indigo-500/10 text-center backdrop-blur-xl relative overflow-hidden shadow-2xl"
+            transition={{ delay: 0.2 }}
+            className="max-w-2xl mx-auto bg-white/5 border border-white/10 rounded-[2rem] p-8 relative overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
-            <div className="relative z-10">
-              <div className="w-20 h-20 mx-auto rounded-3xl flex items-center justify-center bg-indigo-500/20 text-indigo-400 mb-6 shadow-xl border border-white/10">
-                <Activity size={40} />
+            <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
+            <div className="flex items-start gap-4 relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+                <Lucide.Lightbulb size={24} />
               </div>
-              <div className="text-7xl font-black text-white mb-2">{score}%</div>
-              <div className="text-indigo-300 font-bold text-xl mb-4">مستوى النقاء العام</div>
-              <p className="text-gray-400 text-xl font-medium">
-                لديك <span className="text-emerald-400 font-black">{positiveHabitsCount}</span> عادات إيجابية و <span className="text-rose-400 font-black">{negativeHabitsCount}</span> عادات سلبية.
-              </p>
+              <div>
+                <h3 className="text-xl font-black text-white mb-2">نصيحة لك</h3>
+                <p className="text-gray-400 leading-relaxed font-medium">
+                  {score >= 80 
+                    ? "أنت في مسار رائع! استمر في تعزيز عاداتك الإيجابية وكن قدوة لمن حولك. التميز ليس فعلاً بل عادة."
+                    : score >= 50
+                    ? "لديك أساس قوي، لكن بعض العادات السلبية تعيق تقدمك الكامل. ركز على تغيير عادة واحدة سلبية كل أسبوع."
+                    : "البداية دائماً هي الأصعب. لا تنظر لكثرة العادات السلبية، بل ابدأ بأبسطها تغييراً وستشعر بفرق كبير في طاقتك."}
+                </p>
+              </div>
             </div>
           </motion.div>
 
-          {/* Detailed Lists */}
-          <div className="max-w-2xl mx-auto space-y-12">
-            {/* Bad Habits Section */}
-            {detectedBadHabits.length > 0 && (
-              <section className="space-y-6">
-                <div className="flex items-center gap-3 px-2">
-                  <div className="w-12 h-12 rounded-2xl bg-rose-500/20 flex items-center justify-center text-rose-500">
-                    <ShieldAlert size={28} />
-                  </div>
-                  <h3 className="text-2xl md:text-3xl font-black text-white">الجانب المظلم (عادات تحتاج تغيير)</h3>
-                </div>
-                <div className="space-y-4">
-                  {detectedBadHabits.map((habit, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: idx * 0.1 }}
-                      className="bg-white/5 border border-white/10 rounded-[2rem] p-6 md:p-8 space-y-6 hover:bg-white/[0.07] transition-colors"
-                    >
-                      <h4 className="text-2xl font-black text-rose-400">{habit.habit}</h4>
-                      <div className="grid gap-4 md:grid-cols-2">
-                        {habit.harm && (
-                          <div className="bg-rose-500/5 p-5 rounded-2xl border border-rose-500/10">
-                            <div className="text-rose-300 font-black text-sm mb-2 uppercase tracking-wider">الضرر:</div>
-                            <p className="text-gray-300 text-base leading-relaxed">{habit.harm}</p>
-                          </div>
-                        )}
-                        {habit.punishment && (
-                          <div className="bg-orange-500/5 p-5 rounded-2xl border border-orange-500/10">
-                            <div className="text-orange-300 font-black text-sm mb-2 uppercase tracking-wider">العاقبة:</div>
-                            <p className="text-gray-300 text-base leading-relaxed">{habit.punishment}</p>
-                          </div>
-                        )}
-                      </div>
-                      {habit.solution && (
-                        <div className="bg-emerald-500/5 p-5 rounded-2xl border border-emerald-500/10">
-                          <div className="text-emerald-300 font-black text-sm mb-2 uppercase tracking-wider">الحل والتعافي:</div>
-                          <p className="text-gray-300 text-base leading-relaxed">{habit.solution}</p>
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Good Habits Section */}
-            {detectedGoodHabits.length > 0 && (
-              <section className="space-y-6">
-                <div className="flex items-center gap-3 px-2">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-500">
-                    <Sparkles size={28} />
-                  </div>
-                  <h3 className="text-2xl md:text-3xl font-black text-white">الجانب المشرق (عادات إيجابية)</h3>
-                </div>
-                <div className="space-y-4">
-                  {detectedGoodHabits.map((habit, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ x: 20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: idx * 0.1 }}
-                      className="bg-white/5 border border-white/10 rounded-[2rem] p-6 md:p-8 space-y-6 hover:bg-white/[0.07] transition-colors"
-                    >
-                      <h4 className="text-2xl font-black text-emerald-400">{habit.habit}</h4>
-                      <div className="grid gap-4 md:grid-cols-2">
-                        {habit.benefit && (
-                          <div className="bg-emerald-500/5 p-5 rounded-2xl border border-emerald-500/10">
-                            <div className="text-emerald-300 font-black text-sm mb-2 uppercase tracking-wider">النفع:</div>
-                            <p className="text-gray-300 text-base leading-relaxed">{habit.benefit}</p>
-                          </div>
-                        )}
-                        {habit.consistency && (
-                          <div className="bg-blue-500/5 p-5 rounded-2xl border border-blue-500/10">
-                            <div className="text-blue-300 font-black text-sm mb-2 uppercase tracking-wider">الثبات:</div>
-                            <p className="text-gray-300 text-base leading-relaxed">{habit.consistency}</p>
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </section>
-            )}
+          {/* Score Summary (Optional but good for context) */}
+          <div className="text-center max-w-2xl mx-auto">
+             <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 border border-white/10 text-gray-400 font-bold">
+               <span>مستوى النقاء العام:</span>
+               <span className="text-indigo-400 font-black">{score}%</span>
+             </div>
           </div>
+        </div>
 
-          {/* Retake Button */}
-          <div className="max-w-2xl mx-auto pt-12">
+        {/* Fixed Bottom Buttons */}
+        <div className="fixed bottom-0 left-0 right-0 p-6 bg-white dark:bg-[#0a0a0a]/90 backdrop-blur-xl border-t border-gray-200 dark:border-white/10 z-50">
+          <div className="max-w-2xl mx-auto grid grid-cols-2 gap-4">
             <Button
-              onClick={handleReset}
-              variant="outline"
-              fullWidth
-              className="h-16 rounded-2xl border-2 border-white/10 bg-white/5 text-white font-black text-xl hover:bg-white/10 transition-all flex items-center justify-center gap-3 shadow-xl"
+              onClick={() => {
+                playPop();
+                handleSetView('bright_side');
+              }}
+              className="h-14 rounded-2xl font-black text-base bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 transition-all"
             >
-              <RotateCcw size={24} />
-              إعادة الاختبار
+              عرض الجانب المشرق
+            </Button>
+            <Button
+              onClick={() => {
+                playPop();
+                handleSetView('dark_side');
+              }}
+              className="h-14 rounded-2xl font-black text-base bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-500/20 transition-all"
+            >
+              عرض الجانب المظلم
             </Button>
           </div>
         </div>
@@ -1482,8 +1524,252 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
     );
   };
 
+  const renderBrightSide = () => {
+    return (
+      <motion.div
+        initial={{ opacity: 0, x: 100 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -100 }}
+        className="fixed inset-0 z-[80] flex flex-col bg-white dark:bg-[#0a0a0a] overflow-hidden"
+      >
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-white/5 bg-white dark:bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
+          <Button 
+            onClick={() => {
+              playPop();
+              handleSetView('results');
+            }}
+            variant="ghost"
+            className="w-10 h-10 p-0 flex items-center justify-center bg-white/5 hover:bg-white/10 text-white rounded-full"
+          >
+            <ArrowRight size={20} />
+          </Button>
+          <h2 className="text-xl font-black text-emerald-400">الجانب المشرق</h2>
+          <div className="w-10" />
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 pb-12">
+          <div className="max-w-2xl mx-auto space-y-4">
+            {detectedGoodHabits.length > 0 ? (
+              detectedGoodHabits.map((habit, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: idx * 0.05 }}
+                  onClick={() => {
+                    playPop();
+                    setSelectedHabit({ ...habit, type: 'good' });
+                    handleSetView('habit_detail');
+                  }}
+                  className="bg-white/5 border border-white/10 rounded-[2rem] p-6 md:p-8 space-y-6 hover:bg-white/[0.07] transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-500">
+                        <Sparkles size={24} />
+                      </div>
+                      <h4 className="text-xl md:text-2xl font-black text-emerald-400">{habit.habit}</h4>
+                    </div>
+                    <ChevronLeft className="text-emerald-500/50 group-hover:text-emerald-500 transition-colors" />
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="text-center py-20">
+                <p className="text-gray-500 text-lg">لا توجد عادات إيجابية مكتشفة حالياً.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
+
+  const renderDarkSide = () => {
+    return (
+      <motion.div
+        initial={{ opacity: 0, x: -100 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 100 }}
+        className="fixed inset-0 z-[80] flex flex-col bg-white dark:bg-[#0a0a0a] overflow-hidden"
+      >
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-white/5 bg-white dark:bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
+          <Button 
+            onClick={() => {
+              playPop();
+              handleSetView('results');
+            }}
+            variant="ghost"
+            className="w-10 h-10 p-0 flex items-center justify-center bg-white/5 hover:bg-white/10 text-white rounded-full"
+          >
+            <ArrowRight size={20} />
+          </Button>
+          <h2 className="text-xl font-black text-rose-400">الجانب المظلم</h2>
+          <div className="w-10" />
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 pb-12">
+          <div className="max-w-2xl mx-auto space-y-4">
+            {detectedBadHabits.length > 0 ? (
+              detectedBadHabits.map((habit, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: idx * 0.05 }}
+                  onClick={() => {
+                    playPop();
+                    setSelectedHabit({ ...habit, type: 'bad' });
+                    handleSetView('habit_detail');
+                  }}
+                  className="bg-white/5 border border-white/10 rounded-[2rem] p-6 md:p-8 space-y-6 hover:bg-white/[0.07] transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-rose-500/20 flex items-center justify-center text-rose-500">
+                        <ShieldAlert size={24} />
+                      </div>
+                      <h4 className="text-xl md:text-2xl font-black text-rose-400">{habit.habit}</h4>
+                    </div>
+                    <ChevronLeft className="text-rose-500/50 group-hover:text-rose-500 transition-colors" />
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="text-center py-20">
+                <p className="text-gray-500 text-lg">أحسنت! لا توجد عادات سلبية مكتشفة.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
+
+  const renderHabitDetail = () => {
+    if (!selectedHabit) return null;
+    const isGood = selectedHabit.type === 'good';
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="fixed inset-0 z-[90] flex flex-col bg-white dark:bg-[#0a0a0a] overflow-hidden"
+      >
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-white/5 bg-white dark:bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
+          <Button 
+            onClick={() => {
+              playPop();
+              handleSetView(isGood ? 'bright_side' : 'dark_side');
+            }}
+            variant="ghost"
+            className="w-10 h-10 p-0 flex items-center justify-center bg-white/5 hover:bg-white/10 text-white rounded-full"
+          >
+            <ArrowRight size={20} />
+          </Button>
+          <h2 className={`text-xl font-black ${isGood ? 'text-emerald-400' : 'text-rose-400'}`}>
+            تفاصيل العادة
+          </h2>
+          <div className="w-10" />
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-8 pb-24">
+          <div className="max-w-2xl mx-auto space-y-8">
+            <div className="text-center space-y-4">
+              <div className={`w-24 h-24 mx-auto rounded-[2rem] flex items-center justify-center ${isGood ? 'bg-emerald-500/20 text-emerald-500' : 'bg-rose-500/20 text-rose-500'}`}>
+                {isGood ? <Sparkles size={48} /> : <ShieldAlert size={48} />}
+              </div>
+              <h3 className={`text-3xl md:text-4xl font-black ${isGood ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {selectedHabit.habit}
+              </h3>
+            </div>
+
+            <div className="grid gap-6">
+              {isGood ? (
+                <>
+                  {selectedHabit.benefit && (
+                    <motion.div
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      className="bg-emerald-500/5 p-8 rounded-[2rem] border border-emerald-500/10 space-y-4"
+                    >
+                      <div className="flex items-center gap-3 text-emerald-300">
+                        <Lucide.Gift size={24} />
+                        <span className="font-black text-lg">النفع والفوائد</span>
+                      </div>
+                      <p className="text-gray-300 text-lg leading-relaxed">{selectedHabit.benefit}</p>
+                    </motion.div>
+                  )}
+                  {selectedHabit.consistency && (
+                    <motion.div
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                      className="bg-blue-500/5 p-8 rounded-[2rem] border border-blue-500/10 space-y-4"
+                    >
+                      <div className="flex items-center gap-3 text-blue-300">
+                        <Lucide.Anchor size={24} />
+                        <span className="font-black text-lg">الثبات والاستمرارية</span>
+                      </div>
+                      <p className="text-gray-300 text-lg leading-relaxed">{selectedHabit.consistency}</p>
+                    </motion.div>
+                  )}
+                </>
+              ) : (
+                <>
+                  {selectedHabit.harm && (
+                    <motion.div
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      className="bg-rose-500/5 p-8 rounded-[2rem] border border-rose-500/10 space-y-4"
+                    >
+                      <div className="flex items-center gap-3 text-rose-300">
+                        <Lucide.Skull size={24} />
+                        <span className="font-black text-lg">الضرر والمخاطر</span>
+                      </div>
+                      <p className="text-gray-300 text-lg leading-relaxed">{selectedHabit.harm}</p>
+                    </motion.div>
+                  )}
+                  {selectedHabit.punishment && (
+                    <motion.div
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                      className="bg-orange-500/5 p-8 rounded-[2rem] border border-orange-500/10 space-y-4"
+                    >
+                      <div className="flex items-center gap-3 text-orange-300">
+                        <Lucide.Gavel size={24} />
+                        <span className="font-black text-lg">العاقبة والجزاء</span>
+                      </div>
+                      <p className="text-gray-300 text-lg leading-relaxed">{selectedHabit.punishment}</p>
+                    </motion.div>
+                  )}
+                  {selectedHabit.solution && (
+                    <motion.div
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className="bg-emerald-500/5 p-8 rounded-[2rem] border border-emerald-500/10 space-y-4"
+                    >
+                      <div className="flex items-center gap-3 text-emerald-300">
+                        <Lucide.HeartPulse size={24} />
+                        <span className="font-black text-lg">الحل والتعافي</span>
+                      </div>
+                      <p className="text-gray-300 text-lg leading-relaxed">{selectedHabit.solution}</p>
+                    </motion.div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
+
   return (
-    <div className="pb-24 pt-0 px-0">
+    <div className="pb-24 pt-0 px-0" dir="rtl">
       <AnimatePresence mode="wait">
         {view === 'intro' && <div key="intro">{renderIntro()}</div>}
         {view === 'test_selection' && <div key="test_selection">{renderTestSelection()}</div>}
@@ -1491,6 +1777,9 @@ export const HabitsPage = ({ onViewChange, onBack, onComplete, initialView, onAc
         {view === 'area_result' && <div key="area_result">{renderAreaResult()}</div>}
         {view === 'result_summary' && <div key="result_summary">{renderResultSummary()}</div>}
         {view === 'results' && <div key="results">{renderResults()}</div>}
+        {view === 'bright_side' && <div key="bright_side">{renderBrightSide()}</div>}
+        {view === 'dark_side' && <div key="dark_side">{renderDarkSide()}</div>}
+        {view === 'habit_detail' && <div key="habit_detail">{renderHabitDetail()}</div>}
       </AnimatePresence>
     </div>
   );

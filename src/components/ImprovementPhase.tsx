@@ -454,27 +454,43 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
         const merged = ROUTINES.map(initRoutine => {
           const savedRoutine = parsed.find((r: any) => r.id === initRoutine.id);
           if (savedRoutine) {
+            // Get all categories from saved state that are not in initial state (custom categories)
+            const customCategories = savedRoutine.categories.filter((sc: any) => 
+              !initRoutine.categories.some(ic => ic.id === sc.id)
+            );
+
             return {
               ...initRoutine,
-              categories: initRoutine.categories.map(initCat => {
-                const savedCat = savedRoutine.categories.find((c: any) => c.id === initCat.id);
-                if (savedCat) {
-                  return {
-                    ...initCat,
-                    current: shouldReset ? 0 : (Number(savedCat.current) || 0),
-                    target: Number(savedCat.target) || initCat.target || 0,
-                    rewardClaimed: shouldReset ? false : !!savedCat.rewardClaimed,
-                    tasks: (savedCat.tasks || []).map((t: any) => {
-                      const initTask = initCat.tasks.find((it: any) => it.id === t.id);
-                      return {
-                        ...t,
-                        title: t.title || (initTask ? initTask.title : 'مهمة بدون عنوان')
-                      };
-                    })
-                  };
-                }
-                return initCat;
-              })
+              categories: [
+                ...initRoutine.categories.map(initCat => {
+                  const savedCat = savedRoutine.categories.find((c: any) => c.id === initCat.id);
+                  if (savedCat) {
+                    return {
+                      ...initCat,
+                      current: shouldReset ? 0 : (Number(savedCat.current) || 0),
+                      target: Number(savedCat.target) || initCat.target || 0,
+                      rewardClaimed: shouldReset ? false : !!savedCat.rewardClaimed,
+                      tasks: (savedCat.tasks || []).map((t: any) => {
+                        const initTask = initCat.tasks.find((it: any) => it.id === t.id);
+                        return {
+                          ...t,
+                          title: t.title || (initTask ? initTask.title : 'مهمة بدون عنوان')
+                        };
+                      })
+                    };
+                  }
+                  return initCat;
+                }),
+                ...customCategories.map((cc: any) => ({
+                  ...cc,
+                  current: shouldReset ? 0 : (Number(cc.current) || 0),
+                  rewardClaimed: shouldReset ? false : !!cc.rewardClaimed,
+                  tasks: (cc.tasks || []).map((t: any) => ({
+                    ...t,
+                    title: t.title || 'مهمة بدون عنوان'
+                  }))
+                }))
+              ]
             };
           }
           return initRoutine;
@@ -523,10 +539,15 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
   const [isProgressOpen, setIsProgressOpen] = useState(false);
 
   const [isAddingRoutine, setIsAddingRoutine] = useState(false);
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [newRoutineTitle, setNewRoutineTitle] = useState('');
   const [newRoutineDesc, setNewRoutineDesc] = useState('');
   const [newRoutineIcon, setNewRoutineIcon] = useState('Star');
+  const [newCategoryTitle, setNewCategoryTitle] = useState('');
+  const [newCategoryIcon, setNewCategoryIcon] = useState('Star');
+  const [newCategoryColor, setNewCategoryColor] = useState('text-purple-500');
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+  const [isCategoryIconPickerOpen, setIsCategoryIconPickerOpen] = useState(false);
 
   const [isTaskManagementOpen, setIsTaskManagementOpen] = useState(false);
   const [isCustomizationOpen, setIsCustomizationOpen] = useState(false);
@@ -622,11 +643,20 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
     // Save to localStorage without the icon components
     const toSave = routines.map(r => ({
       id: r.id,
+      title: r.title,
+      description: r.description,
+      iconName: r.iconName,
       categories: r.categories.map(cat => ({
         id: cat.id,
+        title: cat.title,
+        iconName: cat.iconName,
+        color: cat.color,
+        bg: cat.bg,
+        target: cat.target,
         current: cat.current,
+        unit: cat.unit,
         rewardClaimed: cat.rewardClaimed,
-        tasks: cat.tasks.map(t => ({ id: t.id, completed: t.completed }))
+        tasks: cat.tasks.map(t => ({ id: t.id, title: t.title, completed: t.completed, points: t.points }))
       }))
     }));
     localStorage.setItem('improvement_routines', JSON.stringify(toSave));
@@ -664,6 +694,35 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
     setNewRoutineDesc('');
     setNewRoutineIcon('Star');
     setSelectedRoutineId(newRoutine.id);
+  };
+
+  const handleAddCategory = () => {
+    if (!newCategoryTitle.trim()) return;
+    const newCategory: HabitCategory = {
+      id: `cat_${Date.now()}`,
+      title: newCategoryTitle,
+      iconName: newCategoryIcon,
+      color: newCategoryColor,
+      bg: `${newCategoryColor.replace('text', 'bg')}/10`,
+      target: 0,
+      current: 0,
+      unit: 'مهمة',
+      tasks: [],
+      rewardClaimed: false
+    };
+
+    setRoutines(prev => prev.map(routine => {
+      if (routine.id !== selectedRoutineId) return routine;
+      return {
+        ...routine,
+        categories: [...routine.categories, newCategory]
+      };
+    }));
+
+    setIsAddingCategory(false);
+    setNewCategoryTitle('');
+    setNewCategoryIcon('Star');
+    setNewCategoryColor('text-purple-500');
   };
 
   const handleAddTask = (categoryId: string, title?: string) => {
@@ -1118,6 +1177,19 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
             </div>
           </motion.button>
         ))}
+
+        {/* Add Category Button */}
+        <motion.button
+          whileHover={{ scale: 1.05, y: -5 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsAddingCategory(true)}
+          className="flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6 rounded-[2rem] md:rounded-[2.5rem] bg-gray-50 dark:bg-white/[0.03] border border-dashed border-gray-300 dark:border-white/20 hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-all group relative overflow-hidden shadow-sm dark:shadow-none"
+        >
+          <div className="w-12 h-12 md:w-24 md:h-24 flex items-center justify-center rounded-full bg-gray-100 dark:bg-white/10 text-gray-400 dark:text-white/40">
+            <Plus size={32} className="md:w-12 md:h-12" />
+          </div>
+          <span className="text-[10px] md:text-xs font-black text-gray-400 dark:text-white/40 uppercase tracking-tighter md:tracking-[0.15em]">إضافة قائمة</span>
+        </motion.button>
       </div>
 
       {/* Customization & Settings Overlay */}
@@ -1496,7 +1568,108 @@ export const ImprovementPhase = ({ onActivityComplete }: ImprovementPhaseProps) 
         </div>
       )}
 
-      {/* Routine Selection Slide/Drawer */}
+      {/* Add Category Modal */}
+      {isAddingCategory && (
+        <div className="fixed inset-0 bg-white dark:bg-[#121212] z-[160] p-6 overflow-y-auto transition-colors duration-300">
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div className="flex items-center justify-between mb-6">
+              <h4 className="text-2xl font-black text-gray-900 dark:text-white">إضافة قائمة مهام جديدة</h4>
+              <button onClick={() => setIsAddingCategory(false)} className="p-2 rounded-full bg-gray-100 dark:bg-white/10">
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <label className="block text-right font-bold text-gray-700 dark:text-gray-300">اسم القائمة</label>
+              <input
+                type="text"
+                placeholder="مثال: القراءة، الرياضة، العمل..."
+                value={newCategoryTitle}
+                onChange={(e) => setNewCategoryTitle(e.target.value)}
+                className="w-full bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-2xl px-6 py-4 text-right text-gray-900 dark:text-white focus:outline-none focus:border-purple-500 text-lg"
+              />
+            </div>
+
+            <div className="space-y-4">
+              <label className="block text-right font-bold text-gray-700 dark:text-gray-300">الأيقونة</label>
+              <button
+                onClick={() => setIsCategoryIconPickerOpen(true)}
+                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-2xl text-gray-900 dark:text-white"
+              >
+                <span className="text-gray-500">تغيير الأيقونة</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold">{newCategoryIcon}</span>
+                  {(() => {
+                    const Icon = (LucideIcons as any)[newCategoryIcon] || Circle;
+                    return <Icon size={24} />;
+                  })()}
+                </div>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <label className="block text-right font-bold text-gray-700 dark:text-gray-300">اللون</label>
+              <div className="flex flex-wrap gap-3 justify-end">
+                {[
+                  { name: 'بنفسجي', text: 'text-purple-500', bg: 'bg-purple-500' },
+                  { name: 'أزرق', text: 'text-blue-500', bg: 'bg-blue-500' },
+                  { name: 'أخضر', text: 'text-emerald-500', bg: 'bg-emerald-500' },
+                  { name: 'أصفر', text: 'text-amber-500', bg: 'bg-amber-500' },
+                  { name: 'أحمر', text: 'text-rose-500', bg: 'bg-rose-500' },
+                  { name: 'برتقالي', text: 'text-orange-500', bg: 'bg-orange-500' },
+                ].map((color) => (
+                  <button
+                    key={color.text}
+                    onClick={() => setNewCategoryColor(color.text)}
+                    className={`w-10 h-10 rounded-full ${color.bg} transition-transform ${newCategoryColor === color.text ? 'scale-125 ring-4 ring-gray-200 dark:ring-white/20' : 'opacity-60 hover:opacity-100'}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <Button 
+              variant="primary" 
+              className="w-full py-4 text-lg mt-8" 
+              onClick={handleAddCategory} 
+              disabled={!newCategoryTitle.trim()}
+            >
+              إضافة القائمة
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Category Icon Picker Modal */}
+      {isCategoryIconPickerOpen && (
+        <div className="fixed inset-0 bg-white dark:bg-[#121212] z-[170] p-6 overflow-y-auto transition-colors duration-300">
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div className="flex items-center justify-between mb-6">
+              <h4 className="text-2xl font-black text-gray-900 dark:text-white">اختر أيقونة</h4>
+              <button onClick={() => setIsCategoryIconPickerOpen(false)} className="p-2 rounded-full bg-gray-100 dark:bg-white/10">
+                <X size={24} />
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-3 justify-end p-4 border border-gray-200 dark:border-white/10 rounded-2xl">
+              {AVAILABLE_ICONS.map(iconName => {
+                const Icon = (LucideIcons as any)[iconName] || Circle;
+                return (
+                  <button
+                    key={iconName}
+                    onClick={() => {
+                      setNewCategoryIcon(iconName);
+                      setIsCategoryIconPickerOpen(false);
+                    }}
+                    className={`p-4 rounded-xl border transition-colors ${newCategoryIcon === iconName ? 'bg-purple-500/20 border-purple-500 text-purple-600 dark:text-purple-400' : 'bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-white/10 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5'}`}
+                  >
+                    <Icon size={24} />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {typeof document !== 'undefined' && createPortal(
         <AnimatePresence>
           {isDropdownOpen && (

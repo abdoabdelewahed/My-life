@@ -70,7 +70,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
         {/* Certificate Content */}
         <div 
           ref={setRef}
-          className="absolute inset-0 bg-[#0f0f0f] p-4 md:p-12 flex flex-col items-center justify-between text-center overflow-hidden"
+          className="absolute inset-0 bg-white dark:bg-[#0f0f0f] p-4 md:p-12 flex flex-col items-center justify-between text-center overflow-hidden"
         >
           {/* Ethereal Background Effect */}
           <div className="absolute inset-0 pointer-events-none">
@@ -178,7 +178,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
                     </div>
 
                     <div className="absolute inset-0 bg-gradient-to-br from-amber-200 via-amber-500 to-amber-700 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.3)] md:shadow-[0_0_30px_rgba(245,158,11,0.3)] animate-pulse" />
-                    <div className="absolute inset-0.5 md:inset-1 bg-[#0f0f0f] rounded-full" />
+                    <div className="absolute inset-0.5 md:inset-1 bg-white dark:bg-[#0f0f0f] rounded-full" />
                     <div className="absolute inset-1 md:inset-2 bg-gradient-to-br from-amber-200 via-amber-500 to-amber-700 rounded-full flex items-center justify-center">
                       <Trophy size={12} className="text-amber-900 md:w-7 md:h-7" />
                     </div>
@@ -295,7 +295,7 @@ export const CertificatesPage: React.FC<CertificatesPageProps> = ({ pathProgress
 
   return (
     <div className="space-y-6 md:space-y-10 px-2 md:px-0" dir="rtl">
-      <div className="sticky top-0 z-20 bg-[#121212] flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 mb-6 md:mb-10 pb-4 border-b border-white/5">
+      <div className="sticky top-0 z-20 bg-white dark:bg-[#121212] flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 mb-6 md:mb-10 pb-4 border-b border-gray-200 dark:border-white/5">
         <div className="flex items-center gap-4 w-full md:w-auto">
           <Button onClick={onBack} variant="ghost" size="sm" className="p-2">
             <ChevronLeft size={24} />

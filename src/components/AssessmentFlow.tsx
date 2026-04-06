@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as Lucide from 'lucide-react';
 const { X, CheckCircle2, ArrowRight, ArrowLeft, Brain, Volume2, VolumeX, Loader2 } = Lucide;
-import confetti from 'canvas-confetti';
 import { playPop, playLevelUp } from '../utils/sounds';
 import { getOrGenerateAudio } from '../services/audioCache';
 import { playBase64Audio } from '../utils/audio';
@@ -43,12 +42,6 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ assessment, onClose, on
       setStage('celebration');
       setIsTransitioning(false);
       playLevelUp();
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#3b82f6', '#8b5cf6', '#10b981']
-      });
     }
   };
 

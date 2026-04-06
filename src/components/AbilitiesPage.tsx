@@ -7,7 +7,6 @@ const {
   BarChart3, Lightbulb, X, AlertTriangle
 } = Lucide;
 import { CircularProgress } from './CircularProgress';
-import confetti from 'canvas-confetti';
 import { playPop, playLevelUp } from '../utils/sounds';
 import AssessmentFlow from './AssessmentFlow';
 import { Button } from './ui/Button';
@@ -278,16 +277,14 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
     onActivityComplete?.(50); // Award 50 XP for completing an assessment
     
     playLevelUp();
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#3b82f6', '#8b5cf6', '#10b981']
-    });
 
     setSelectedSubCategory(null);
-    setResultStep(0);
-    setView('results');
+    if (subCategories.length > 1) {
+      setView('result_summary');
+    } else {
+      setResultStep(0);
+      setView('results');
+    }
   };
 
 
@@ -312,7 +309,6 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
     if (assessment.id === 'confidence') return `ثقتك بنفسك ${levelText}`;
     if (assessment.id === 'skills') return `مستوى مهاراتك ${levelText}`;
     if (assessment.id === 'traits') return `مستوى صفاتك الإيجابية ${levelText}`;
-    if (assessment.id === 'physical_health') return `مستوى صحتك البدنية ${levelText}`;
     
     return `النتيجة: ${levelText}`;
   };
@@ -343,46 +339,46 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
       return {
         border: 'border-emerald-500/30 hover:border-emerald-500/50 border-b-emerald-800',
         iconBg: 'bg-emerald-500/20',
-        iconText: 'text-emerald-400',
-        badge: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+        iconText: 'text-emerald-600 dark:text-emerald-400',
+        badge: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
         progressBg: 'bg-emerald-500/20',
         progressFill: 'bg-emerald-500',
         buttonBg: 'bg-emerald-500/20',
         buttonHover: 'hover:bg-emerald-500/30',
         buttonBorder: 'border-emerald-500/30',
-        cardBg: 'bg-gradient-to-br from-[#0a1a12] to-[#050d09]',
-        scoreText: 'text-transparent bg-clip-text bg-gradient-to-br from-emerald-400 to-emerald-200',
-        dynamicText: 'text-emerald-400'
+        cardBg: 'bg-white dark:bg-gradient-to-br dark:from-[#0a1a12] dark:to-[#050d09]',
+        scoreText: 'text-emerald-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-br dark:from-emerald-400 dark:to-emerald-200',
+        dynamicText: 'text-emerald-600 dark:text-emerald-400'
       };
     } else if (isMid) {
       return {
         border: 'border-blue-500/30 hover:border-blue-500/50 border-b-blue-800',
         iconBg: 'bg-blue-500/20',
-        iconText: 'text-blue-400',
-        badge: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+        iconText: 'text-blue-600 dark:text-blue-400',
+        badge: 'text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-500/20',
         progressBg: 'bg-blue-500/20',
         progressFill: 'bg-blue-500',
         buttonBg: 'bg-blue-500/20',
         buttonHover: 'hover:bg-blue-500/30',
         buttonBorder: 'border-blue-500/30',
-        cardBg: 'bg-gradient-to-br from-[#0a121a] to-[#05090d]',
-        scoreText: 'text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-blue-200',
-        dynamicText: 'text-blue-400'
+        cardBg: 'bg-white dark:bg-gradient-to-br dark:from-[#0a121a] dark:to-[#05090d]',
+        scoreText: 'text-blue-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-br dark:from-blue-400 dark:to-blue-200',
+        dynamicText: 'text-blue-600 dark:text-blue-400'
       };
     } else {
       return {
         border: 'border-orange-500/30 hover:border-orange-500/50 border-b-orange-800',
         iconBg: 'bg-orange-500/20',
-        iconText: 'text-orange-400',
-        badge: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
+        iconText: 'text-orange-600 dark:text-orange-400',
+        badge: 'text-orange-600 dark:text-orange-400 bg-orange-500/10 border-orange-500/20',
         progressBg: 'bg-orange-500/20',
         progressFill: 'bg-orange-500',
         buttonBg: 'bg-orange-500/20',
         buttonHover: 'hover:bg-orange-500/30',
         buttonBorder: 'border-orange-500/30',
-        cardBg: 'bg-gradient-to-br from-[#1a120a] to-[#0d0905]',
-        scoreText: 'text-transparent bg-clip-text bg-gradient-to-br from-orange-400 to-orange-200',
-        dynamicText: 'text-orange-400'
+        cardBg: 'bg-white dark:bg-gradient-to-br dark:from-[#1a120a] dark:to-[#0d0905]',
+        scoreText: 'text-orange-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-br dark:from-orange-400 dark:to-orange-200',
+        dynamicText: 'text-orange-600 dark:text-orange-400'
       };
     }
   };
@@ -628,18 +624,18 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
                   playPop();
                   setView('habits');
                 }}
-                className={`relative group cursor-pointer bg-white dark:bg-[#181818] p-6 md:p-8 rounded-3xl border-2 border-b-4 border-indigo-500/30 dark:border-indigo-500/20 transition-all hover:-translate-y-1 active:translate-y-0 active:border-b-2`}
+                className={`relative group cursor-pointer bg-white dark:bg-[#181818] p-4 md:p-6 rounded-3xl border-2 border-b-4 border-indigo-500/30 dark:border-indigo-500/20 transition-all hover:-translate-y-1 active:translate-y-0 active:border-b-2`}
               >
                 <div className={`absolute inset-0 bg-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl`} />
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-indigo-500/10 text-indigo-500`}>
-                      <Activity className="w-8 h-8" />
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 bg-indigo-500/10 text-indigo-500`}>
+                      <Activity className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className={`text-xl md:text-2xl font-black text-indigo-600 dark:text-indigo-400 mb-2`}>اختبار العادات</h3>
-                      <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-bold">
-                        مكتمل - اضغط لعرض النتيجة
+                      <h3 className={`text-lg md:text-xl font-black text-indigo-600 dark:text-indigo-400 mb-1`}>اختبار العادات</h3>
+                      <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-bold">
+                        {localStorage.getItem('habits_score') || '0'}% - {getLevel(parseInt(localStorage.getItem('habits_score') || '0'), 'positive').label}
                       </p>
                     </div>
                   </div>
@@ -700,22 +696,27 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
                             playPop();
                             setActiveAssessment(assessment);
                             setResultStep(0);
-                            setView('result_summary');
+                            const res = results[assessment.id];
+                            if (res && res.subCategories.length > 1) {
+                              setView('result_summary');
+                            } else {
+                              setView('results');
+                            }
                           }}
-                          className={`relative group cursor-pointer bg-white dark:bg-[#181818] p-6 md:p-8 rounded-3xl border-2 border-b-4 ${colors.border} transition-all hover:-translate-y-1 active:translate-y-0 active:border-b-2`}
+                          className={`relative group cursor-pointer bg-white dark:bg-[#181818] p-4 md:p-6 rounded-3xl border-2 border-b-4 ${colors.border} transition-all hover:-translate-y-1 active:translate-y-0 active:border-b-2`}
                         >
                           <div className={`absolute inset-0 bg-${assessment.color}-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl`} />
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 ${colors.iconBg} ${colors.iconText}`}>
+                              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${colors.iconBg} ${colors.iconText}`}>
                                 {(() => {
                                   const IconComponent = (Lucide as any)[assessment.iconName] || Brain;
-                                  return <IconComponent className="w-8 h-8" />;
+                                  return <IconComponent className="w-6 h-6" />;
                                 })()}
                               </div>
                               <div>
-                                <h3 className={`text-xl md:text-2xl font-black ${colors.iconText} mb-2`}>{assessment.title}</h3>
-                                <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-bold">
+                                <h3 className={`text-lg md:text-xl font-black ${colors.iconText} mb-1`}>{assessment.title}</h3>
+                                <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-bold">
                                   {score}% - {getLevel(score || 0, assessment.type).label}
                                 </p>
                               </div>
@@ -734,15 +735,15 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
                           <div className={`relative bg-white dark:bg-[#181818] border-2 border-b-4 border-gray-200 dark:border-white/10 rounded-3xl p-6 md:p-8 overflow-hidden hover:border-${assessment.color}-500/50 dark:hover:border-${assessment.color}-500/50 transition-colors active:border-b-2 active:translate-y-[2px]`}>
                             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                               <div className="flex items-center gap-4 flex-1">
-                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-${assessment.color}-500/10 text-${assessment.color}-500`}>
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-${assessment.color}-500/10 text-${assessment.color}-500`}>
                                   {(() => {
                                     const IconComponent = (Lucide as any)[assessment.iconName] || Brain;
-                                    return <IconComponent className="w-8 h-8" />;
+                                    return <IconComponent className="w-6 h-6" />;
                                   })()}
                                 </div>
                                 <div>
-                                  <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white mb-2">{assessment.title}</h3>
-                                  <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base leading-relaxed">اكتشف قدراتك في {assessment.title}</p>
+                                  <h3 className="text-lg font-black text-gray-900 dark:text-white mb-1">{assessment.title}</h3>
+                                  <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed">اكتشف قدراتك في {assessment.title}</p>
                                 </div>
                               </div>
                               <Button
@@ -750,7 +751,7 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
                                   e.stopPropagation();
                                   startAssessment(assessment);
                                 }}
-                                className={`w-full md:w-auto h-12 px-8 rounded-2xl font-black text-sm bg-${assessment.color}-600 hover:bg-${assessment.color}-500 text-white shadow-lg shadow-${assessment.color}-500/20`}
+                                className={`w-full md:w-auto h-10 px-6 rounded-xl font-black text-xs bg-${assessment.color}-600 hover:bg-${assessment.color}-500 text-white shadow-md shadow-${assessment.color}-500/20`}
                               >
                                 ابدأ الاختبار
                               </Button>
@@ -780,22 +781,27 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
                             playPop();
                             setActiveAssessment(assessment);
                             setResultStep(0);
-                            setView('result_summary');
+                            const res = results[assessment.id];
+                            if (res && res.subCategories.length > 1) {
+                              setView('result_summary');
+                            } else {
+                              setView('results');
+                            }
                           }}
-                          className={`relative group cursor-pointer bg-white dark:bg-[#181818] p-6 md:p-8 rounded-3xl border-2 border-b-4 ${colors.border} transition-all hover:-translate-y-1 active:translate-y-0 active:border-b-2`}
+                          className={`relative group cursor-pointer bg-white dark:bg-[#181818] p-4 md:p-6 rounded-3xl border-2 border-b-4 ${colors.border} transition-all hover:-translate-y-1 active:translate-y-0 active:border-b-2`}
                         >
                           <div className={`absolute inset-0 bg-${assessment.color}-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl`} />
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 ${colors.iconBg} ${colors.iconText}`}>
+                              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${colors.iconBg} ${colors.iconText}`}>
                                 {(() => {
                                   const IconComponent = (Lucide as any)[assessment.iconName] || Brain;
-                                  return <IconComponent className="w-8 h-8" />;
+                                  return <IconComponent className="w-6 h-6" />;
                                 })()}
                               </div>
                               <div>
-                                <h3 className={`text-xl md:text-2xl font-black ${colors.iconText} mb-2`}>{assessment.title}</h3>
-                                <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-bold">
+                                <h3 className={`text-lg md:text-xl font-black ${colors.iconText} mb-1`}>{assessment.title}</h3>
+                                <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-bold">
                                   {score}% - {getLevel(score || 0, assessment.type).label}
                                 </p>
                               </div>
@@ -814,15 +820,15 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
                           <div className={`relative bg-white dark:bg-[#181818] border-2 border-b-4 border-gray-200 dark:border-white/10 rounded-3xl p-6 md:p-8 overflow-hidden hover:border-${assessment.color}-500/50 dark:hover:border-${assessment.color}-500/50 transition-colors active:border-b-2 active:translate-y-[2px]`}>
                             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                               <div className="flex items-center gap-4 flex-1">
-                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-${assessment.color}-500/10 text-${assessment.color}-500`}>
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-${assessment.color}-500/10 text-${assessment.color}-500`}>
                                   {(() => {
                                     const IconComponent = (Lucide as any)[assessment.iconName] || Brain;
-                                    return <IconComponent className="w-8 h-8" />;
+                                    return <IconComponent className="w-6 h-6" />;
                                   })()}
                                 </div>
                                 <div>
-                                  <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white mb-2">{assessment.title}</h3>
-                                  <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base leading-relaxed">اكتشف قدراتك في {assessment.title}</p>
+                                  <h3 className="text-lg font-black text-gray-900 dark:text-white mb-1">{assessment.title}</h3>
+                                  <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed">اكتشف قدراتك في {assessment.title}</p>
                                 </div>
                               </div>
                               <Button
@@ -830,7 +836,7 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
                                   e.stopPropagation();
                                   startAssessment(assessment);
                                 }}
-                                className={`w-full md:w-auto h-12 px-8 rounded-2xl font-black text-sm bg-${assessment.color}-600 hover:bg-${assessment.color}-500 text-white shadow-lg shadow-${assessment.color}-500/20`}
+                                className={`w-full md:w-auto h-10 px-6 rounded-xl font-black text-xs bg-${assessment.color}-600 hover:bg-${assessment.color}-500 text-white shadow-md shadow-${assessment.color}-500/20`}
                               >
                                 ابدأ الاختبار
                               </Button>
@@ -1080,19 +1086,33 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
         {/* Fixed Navigation Bar */}
         <div className="fixed bottom-0 left-0 right-0 z-50 p-4 md:p-6 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/95 to-transparent backdrop-blur-sm border-t border-white/5">
             <div className="max-w-3xl mx-auto flex gap-4">
-              <Button
-                onClick={handlePrev}
-                disabled={resultStep === 0}
-                variant="ghost"
-                className={`flex-1 h-14 rounded-2xl font-black text-lg transition-all ${
-                  resultStep === 0 ? 'opacity-30 grayscale cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'
-                }`}
-              >
-                <ArrowRight size={20} className="ml-2" />
-                السابق
-              </Button>
+              {totalSteps === 1 ? (
+                <Button
+                  onClick={() => {
+                    playPop();
+                    startAssessment(activeAssessment);
+                  }}
+                  variant="ghost"
+                  className="flex-1 h-14 rounded-2xl font-black text-lg transition-all bg-white/5 hover:bg-white/10 text-white border border-white/10"
+                >
+                  <Target size={20} className="ml-2" />
+                  إعادة الاختبار
+                </Button>
+              ) : (
+                <Button
+                  onClick={handlePrev}
+                  disabled={resultStep === 0}
+                  variant="ghost"
+                  className={`flex-1 h-14 rounded-2xl font-black text-lg transition-all ${
+                    resultStep === 0 ? 'opacity-30 grayscale cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'
+                  }`}
+                >
+                  <ArrowRight size={20} className="ml-2" />
+                  السابق
+                </Button>
+              )}
               
-              {resultStep < totalSteps - 1 && (
+              {resultStep < totalSteps - 1 ? (
                 <Button
                   onClick={handleNext}
                   variant="primary"
@@ -1100,6 +1120,15 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
                 >
                   التالي
                   <ArrowLeft size={20} className="mr-2" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => setView('dashboard')}
+                  variant="primary"
+                  className={`flex-1 h-14 rounded-2xl font-black text-lg transition-all shadow-xl bg-${activeAssessment.color}-600 hover:bg-${activeAssessment.color}-500 text-white shadow-${activeAssessment.color}-500/20`}
+                >
+                  إنهاء
+                  <CheckCircle2 size={20} className="mr-2" />
                 </Button>
               )}
             </div>
@@ -1139,7 +1168,7 @@ export default function AbilitiesPage({ defaultView = 'dashboard', onComplete, o
         onViewChange={() => {}}
         onBack={() => setView('dashboard')}
         onComplete={() => {}}
-        initialView={isFinished ? "result_summary" : "intro"}
+        initialView={isFinished ? "results" : "intro"}
         onActivityComplete={() => {}}
       />
     );
